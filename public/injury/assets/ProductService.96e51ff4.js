@@ -1,0 +1,1 @@
+const e="/";class s{getProductsSmall(){return fetch(e+"demo/data/products-small.json").then(t=>t.json()).then(t=>t.data)}getProducts(){return fetch(e+"demo/data/products.json").then(t=>t.json()).then(t=>t.data)}getProductsWithOrdersSmall(){return fetch(e+"demo/data/products-orders-small.json").then(t=>t.json()).then(t=>t.data)}}export{s as P};

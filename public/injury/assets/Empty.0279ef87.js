@@ -1,0 +1,1 @@
+import{_ as s,b as t,c,d as e}from"./index.a4e21969.js";const a={},o={className:"grid"},n=e("div",{className:"col-12"},[e("div",{className:"card"},[e("h5",null,"Empty Page"),e("p",null,"Use this page to start from scratch and place your custom content.")])],-1),r=[n];function _(d,l){return t(),c("div",o,r)}const m=s(a,[["render",_]]);export{m as default};
