@@ -1371,6 +1371,9 @@ class InjuryServicesController extends Controller
         return $response;
     }
 
+
+
+
     public function getSubjectiveNoiToiPoiDoi(Request $r)
     {
 
@@ -1426,6 +1429,58 @@ class InjuryServicesController extends Controller
         return response()->json($result);
     }
 
+    // public function generateReport(Request $r){
+
+    // }
+
+    public function generateStats(Request $r)
+    {
+        $result = DB::select('SELECT * FROM registry.dbo.GetInjuryCounts(?, ?, ?)', [$r->dateFrom, $r->dateTo, $r->isOneiss]);
+        return response()->json($result);
+    }
+
+    public function generateStatsToExcel(Request $r)
+    {
+        // FacadesLog::info(['received data: ', $r->all]);
+        $newdata = [];
+        $data = $r->array;
+
+        // foreach ($data as $d) {
+        //     $r->replace($d);
+        //     $newdata[] = $r;
+        // }
+
+        $csvFileName = 'Injury.csv';
+        $zipFileName = 'Injury.zip';
+        $filePath = storage_path('app/' . $csvFileName);
+        $zipPath = storage_path('app/' . $zipFileName);
+
+        $file = fopen($filePath, 'w');
+
+        if (!empty($data)) {
+            fputcsv($file, array_keys((array)$data[0]));
+        }
+
+        foreach ($data as $row) {
+            fputcsv($file, (array)$row);
+        }
+
+        fclose($file);
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE) !== TRUE) {
+            return response()->json(['error' => 'Cannot open zip file'], 500);
+        }
+
+        $zip->addFile($filePath, $csvFileName);
+        $zip->close();
+
+        if (file_exists($zipPath)) {
+            return response()->download($zipPath)->deleteFileAfterSend(true);
+        } else {
+            return response()->json(['error' => 'Zip file not found'], 500);
+        }
+    }
     public function getArrayFromFrontEnd(Request $r)
     {
         FacadesLog::info(['received data: ', $r->all]);
@@ -1637,7 +1692,7 @@ class InjuryServicesController extends Controller
         $csvObject->icd_10_nature_er = $rowToExport->details->hospitalFacilityData->icd_10_nature_er;
 
         $csvObject->disposition_code = $rowToExport->header->dispcode;
-        if($rowToExport->header->dispcode === 'OWC'){
+        if ($rowToExport->header->dispcode === 'OWC') {
             $csvObject->disposition_code = 'ABSCN';
         }
         // $csvObject->disposition_code = $rowToExport->details->hospitalFacilityData->disposition_code;
@@ -1728,9 +1783,11 @@ class InjuryServicesController extends Controller
             ['ref_burn_code' => '92', 'ref_burn_desc' => 'Others, Specify'],
         ];
 
-        
-        if (isset($rowToExport->details->ExternalCauseOfInjury->ext_burn_r_doctor) && 
-    $rowToExport->details->ExternalCauseOfInjury->ext_burn_r_doctor === 'Y') {
+
+        if (
+            isset($rowToExport->details->ExternalCauseOfInjury->ext_burn_r_doctor) &&
+            $rowToExport->details->ExternalCauseOfInjury->ext_burn_r_doctor === 'Y'
+        ) {
             FacadesLog::info($rowToExport->details->ExternalCauseOfInjury->ref_burn_code_doctor);
             $csvObject->ext_burn_r = 'Y';
             $doctorBurnCode = $rowToExport->details->ExternalCauseOfInjury->ref_burn_code_doctor;
@@ -1767,10 +1824,7 @@ class InjuryServicesController extends Controller
                 $csvObject->ref_burn_code = 'Unknown Burn Type';
             }
         }
-
+        // FacadesLog::info(['csv: ', $csvObject]);
         return $csvObject;
- 
-
-
     }
 }

@@ -114,6 +114,8 @@ Route::group(
         Route::put('/insertDiagnosis' , [App\Http\Controllers\InjuryServicesController::class, 'insertDiagnosis']);
         Route::put('/updatePrimediag' , [App\Http\Controllers\InjuryServicesController::class, 'updatePrimediag']);
         Route::post('/removeFromRegistry', [App\Http\Controllers\InjuryServicesController::class, 'removeFromRegistry']);
+        Route::get('/generateStats', [App\Http\Controllers\InjuryServicesController::class, 'generateStats']);
+        // Route::post('/generateStatsToExcel', [App\Http\Controllers\InjuryServicesController::class, 'generateStatsToExcel']);
         
 
 
@@ -137,6 +139,7 @@ Route::group(
 
 // moved export to unguarded
 Route::post('/getArrayFromFrontEnd', [App\Http\Controllers\InjuryServicesController::class, 'getArrayFromFrontEnd']);
+Route::post('/generateStatsToExcel', [App\Http\Controllers\InjuryServicesController::class, 'generateStatsToExcel']);
 
 /* ML ROUTES */
 // Route::post('/getKeyTerms', [App\Http\Controllers\MLServicesController::class, 'getKeyTerms']);
@@ -174,4 +177,3 @@ Route::prefix('billing')->group(function() {
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
