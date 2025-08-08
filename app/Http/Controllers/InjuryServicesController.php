@@ -27,6 +27,8 @@ use Clockwork\Support\Laravel\Facade;
 use Exception;
 use Illuminate\Support\Facades\Log as FacadesLog;
 use Illuminate\Support\Log;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\InjuryExport;
 // use Illuminate\Container\Attributes\Log;
 
 class InjuryServicesController extends Controller
@@ -1203,6 +1205,18 @@ class InjuryServicesController extends Controller
             return response()->json([]);
         }
     }
+    public function getListOfDiagnosis(Request $r)
+    {
+        try {
+            $result = DB::table('hospital.dbo.hencdiag_adm')
+                ->select('diagtext', 'tstamp')
+                ->where('enccode', $r->enccode)
+                ->get();
+            return $result;
+        } catch (\Exception $e) {
+            return response()->json([]);
+        }
+    }
     // public function getFormDetail(Request $r)
     // {
     //     // FacadesLog::info(['Form: ', $r->enccode]);
@@ -1433,22 +1447,59 @@ class InjuryServicesController extends Controller
 
     // }
 
+
+
+    // public function generateStatsToExcel(Request $r)
+    // {
+    //     // FacadesLog::info(['received data: ', $r->all]);
+    //     $newdata = [];
+    //     $data = $r->array;
+
+    //     // foreach ($data as $d) {
+    //     //     $r->replace($d);
+    //     //     $newdata[] = $r;
+    //     // }
+
+    //     $csvFileName = 'Injury.csv';
+    //     $zipFileName = 'Injury.zip';
+    //     $filePath = storage_path('app/' . $csvFileName);
+    //     $zipPath = storage_path('app/' . $zipFileName);
+
+    //     $file = fopen($filePath, 'w');
+
+    //     if (!empty($data)) {
+    //         fputcsv($file, array_keys((array)$data[0]));
+    //     }
+
+    //     foreach ($data as $row) {
+    //         fputcsv($file, (array)$row);
+    //     }
+
+    //     fclose($file);
+
+    //     $zip = new ZipArchive();
+    //     if ($zip->open($zipPath, ZipArchive::CREATE) !== TRUE) {
+    //         return response()->json(['error' => 'Cannot open zip file'], 500);
+    //     }
+
+    //     $zip->addFile($filePath, $csvFileName);
+    //     $zip->close();
+
+    //     if (file_exists($zipPath)) {
+    //         return response()->download($zipPath)->deleteFileAfterSend(true);
+    //     } else {
+    //         return response()->json(['error' => 'Zip file not found'], 500);
+    //     }
+    // }
     public function generateStats(Request $r)
     {
         $result = DB::select('SELECT * FROM registry.dbo.GetInjuryCounts(?, ?, ?)', [$r->dateFrom, $r->dateTo, $r->isOneiss]);
         return response()->json($result);
     }
-
     public function generateStatsToExcel(Request $r)
     {
-        // FacadesLog::info(['received data: ', $r->all]);
         $newdata = [];
         $data = $r->array;
-
-        // foreach ($data as $d) {
-        //     $r->replace($d);
-        //     $newdata[] = $r;
-        // }
 
         $csvFileName = 'Injury.csv';
         $zipFileName = 'Injury.zip';
@@ -1472,7 +1523,14 @@ class InjuryServicesController extends Controller
             return response()->json(['error' => 'Cannot open zip file'], 500);
         }
 
+        // Set the password for the zip file
+        $zip->setPassword('bghmcCensus');
+
+        // Add the CSV file to the zip
         $zip->addFile($filePath, $csvFileName);
+        // Encrypt the file with the password
+        $zip->setEncryptionName($csvFileName, ZipArchive::EM_AES_256);
+
         $zip->close();
 
         if (file_exists($zipPath)) {
@@ -1681,7 +1739,9 @@ class InjuryServicesController extends Controller
         if (($rowToExport->details->ExternalCauseOfInjury->vawc ?? null) === 'Y') {
             $diagnosis .= "\n-VAWC"; // Append 'VAWC' to the diagnosis
         }
-
+         if (!empty($rowToExport->details->hospitalFacilityData->customizedDiagnosis)) {
+            $diagnosis = $rowToExport->details->hospitalFacilityData->customizedDiagnosis; 
+        }
         //already in automated diagnosis
         // if (($rowToExport->details->ExternalCauseOfInjury->vawc ?? null) === 'Y') {
         //     $diagnosis .= ' VAWC'; // Append 'VAWC' to the diagnosis

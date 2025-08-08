@@ -48,7 +48,8 @@ class AuthController extends Controller
         $response = redirect("http://localhost:5173/#/injury?enccode={$r->enccode}&access_token={$array['data   ']['token']['plainTextToken']}");
         */
         // $response = redirect("http://192.168.7.66/#/injury/PatientFromEMR?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
-        $response = redirect("http://172.16.0.2:65352/#/injury/PatientFromEMR?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
+        // $response = redirect("http://192.168.6.58:62043/#/injury/PatientFromEMR?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
+       $response = redirect("http://localhost:5173/#/injury/PatientFromEMR?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
       
         // dd($response);
         // $response = redirect("https://192.168.7.66/#/injury/PatientFromEMR?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");

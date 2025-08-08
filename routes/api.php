@@ -33,7 +33,6 @@ Route::get('/fromEMR', [AuthController::class, 'loginById']);
 Route::get('/test-cookie', function () {
     return response('Test Cookie')
         ->cookie('test_cookie', 'test_value', 60, '/', '.bghmc.com', true, true, false, 'None');
-
 });
 
 Route::get('/csrf', function () {
@@ -42,16 +41,16 @@ Route::get('/csrf', function () {
 });
 // Protected routes
 
-        
+
 Route::middleware(['cors'])->group(function () {
     Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show'])->name('sanctum.csrf-cookie');
 });
 // Route::get('/provinceByRegion', [App\Http\Controllers\GeneralServicesContoller::class, 'provinceByRegion']);
 //  Route::get('/cityByProvince', [App\Http\Controllers\GeneralServicesContoller::class, 'cityByProvince']);
 //  Route::get('/regions', [App\Http\Controllers\GeneralServicesContoller::class, 'regions']);
-        // Route::get('/bgyByCity', [App\Http\Controllers\GeneralServicesContoller::class, 'bgyByCity']);
-        
-            // Route::get('/cityByProvince', [App\Http\Controllers\GeneralServicesContoller::class, 'cityByProvince']);
+// Route::get('/bgyByCity', [App\Http\Controllers\GeneralServicesContoller::class, 'bgyByCity']);
+
+// Route::get('/cityByProvince', [App\Http\Controllers\GeneralServicesContoller::class, 'cityByProvince']);
 Route::group(
     ['middleware' => ['auth:sanctum']],
     function () {
@@ -70,8 +69,14 @@ Route::group(
 
 
 
-      //INJURY ROUTES
+        //INJURY ROUTES
         Route::get('/locations', [App\Http\Controllers\GeneralServicesContoller::class, 'locations']);
+        Route::get('/newlocations', [App\Http\Controllers\GeneralServicesContoller::class, 'newlocations']);
+        Route::get('/newRegion', [App\Http\Controllers\GeneralServicesContoller::class, 'newRegion']);
+        Route::get('/newProvince', [App\Http\Controllers\GeneralServicesContoller::class, 'newProvince']);
+        Route::get('/newCity', [App\Http\Controllers\GeneralServicesContoller::class, 'newCity']);
+        Route::get('/newBarangay', [App\Http\Controllers\GeneralServicesContoller::class, 'newBarangay']);
+
         Route::prefix('locations')->group(function () {
 
             Route::get('/provinceByRegion', [App\Http\Controllers\GeneralServicesContoller::class, 'provinceByRegion']);
@@ -90,8 +95,8 @@ Route::group(
         Route::get('/getPatientReferral', [App\Http\Controllers\InjuryServicesController::class, 'getPatientReferral']);
 
         Route::post('/reportList', [App\Http\Controllers\InjuryServicesController::class, 'reportList']);
-        Route::post('/injuryList', [App\Http\Controllers\InjuryServicesController::class, 'injuryList']); 
-        Route::post('/injuryListDev', [App\Http\Controllers\InjuryServicesController::class, 'injuryListDev']); 
+        Route::post('/injuryList', [App\Http\Controllers\InjuryServicesController::class, 'injuryList']);
+        Route::post('/injuryListDev', [App\Http\Controllers\InjuryServicesController::class, 'injuryListDev']);
         Route::get('/injuryList2', [App\Http\Controllers\InjuryServicesController::class, 'injuryList2']);
         Route::post('/injuryList3', [App\Http\Controllers\InjuryServicesController::class, 'injuryList3']);
         Route::get('/injuryList/{enccode}', [App\Http\Controllers\InjuryServicesController::class, 'injuryPatient']);
@@ -99,7 +104,7 @@ Route::group(
         Route::get('/injuryListNoData/{enccode}', [App\Http\Controllers\InjuryServicesController::class, 'injuryPatientNoData']);
         Route::get('/injuryList2/{enccode}', [App\Http\Controllers\InjuryServicesController::class, 'injuryPatient2']);
         // Route::post('/user/{username}', [App\Http\Controllers\InjuryServicesController::class, 'getUserInfo']);
-        Route::put('/exportToExcelSaveData',[App\Http\Controllers\InjuryServicesController::class, 'exportToExcelSaveData']);
+        Route::put('/exportToExcelSaveData', [App\Http\Controllers\InjuryServicesController::class, 'exportToExcelSaveData']);
 
         Route::post('/saveData', [App\Http\Controllers\InjuryServicesController::class, 'saveData']);
         Route::get('/getLatestEntryOfDoctors', [App\Http\Controllers\InjuryServicesController::class, 'getLatestEntryOfDoctors']);
@@ -110,13 +115,15 @@ Route::group(
         Route::put('/updateStatusForArchived', [App\Http\Controllers\InjuryServicesController::class, 'updateStatusForArchived']);
         Route::put('/insertObjSubj', [App\Http\Controllers\InjuryServicesController::class, 'insertObjSubj']);
         Route::put('/updateMedilogs', [App\Http\Controllers\InjuryServicesController::class, 'updateMedilogs']);
-        Route::put('/insertBillingDiagnosis' , [App\Http\Controllers\InjuryServicesController::class, 'insertBillingDiagnosis']);
-        Route::put('/insertDiagnosis' , [App\Http\Controllers\InjuryServicesController::class, 'insertDiagnosis']);
-        Route::put('/updatePrimediag' , [App\Http\Controllers\InjuryServicesController::class, 'updatePrimediag']);
+        Route::put('/insertBillingDiagnosis', [App\Http\Controllers\InjuryServicesController::class, 'insertBillingDiagnosis']);
+        Route::put('/insertDiagnosis', [App\Http\Controllers\InjuryServicesController::class, 'insertDiagnosis']);
+        Route::put('/updatePrimediag', [App\Http\Controllers\InjuryServicesController::class, 'updatePrimediag']);
         Route::post('/removeFromRegistry', [App\Http\Controllers\InjuryServicesController::class, 'removeFromRegistry']);
         Route::get('/generateStats', [App\Http\Controllers\InjuryServicesController::class, 'generateStats']);
+        Route::get('/getListOfDiagnosis', [App\Http\Controllers\InjuryServicesController::class, 'getListOfDiagnosis']);
+
         // Route::post('/generateStatsToExcel', [App\Http\Controllers\InjuryServicesController::class, 'generateStatsToExcel']);
-        
+
 
 
         Route::post('/getSubjective', [App\Http\Controllers\InjuryServicesController::class, 'getSubjective']);
@@ -126,7 +133,7 @@ Route::group(
         Route::post('/extractNOIPOIDOITOIMOI', [App\Http\Controllers\InjuryServicesController::class, 'extractNOIPOIDOITOIMOI']);
         // Route::post('/getArrayFromFrontEnd', [App\Http\Controllers\InjuryServicesController::class, 'getArrayFromFrontEnd']);
         // 
-        
+
 
         // Route::prefix('cancer')->group(
         //     function () {
@@ -159,7 +166,7 @@ Route::group(
                 Route::get('/cancerMasterList', [App\Http\Controllers\CancerServicesController::class, 'cancerMasterList']);
                 Route::post('/upload', [App\Http\Controllers\CancerServicesController::class, 'uploadFile']);
                 Route::post('/getupload', [App\Http\Controllers\CancerServicesController::class, 'getUploadedFiles']);
-                Route::post('/getEncounters',[App\Http\Controllers\CancerServicesController::class, 'getAllEncounters']);
+                Route::post('/getEncounters', [App\Http\Controllers\CancerServicesController::class, 'getAllEncounters']);
             }
         );
     }
@@ -167,8 +174,9 @@ Route::group(
 
 
 
-Route::prefix('billing')->group(function() {
-    
+Route::prefix('billing')->group(
+    function () {
+
         Route::get('/billStatusList', [App\Http\Controllers\BillingServicesController::class, 'billStatusList']);
     }
 );

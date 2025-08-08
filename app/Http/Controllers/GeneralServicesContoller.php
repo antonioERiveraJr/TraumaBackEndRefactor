@@ -45,6 +45,18 @@ class GeneralServicesContoller extends Controller
         return $result;
     }
 
+
+    public function newlocations(Request $r)
+    {
+        $result = Cache::remember('newlocations', 3600, function () {
+            return DB::select('exec registry.dbo.getLocations');
+        });
+        return $result;
+    }
+     
+
+
+
     //implement function to get unique RegionCode and RegionDesc for locations
 
 
@@ -54,11 +66,11 @@ class GeneralServicesContoller extends Controller
 
     //convert to DB:table ORM "select distinct provcode, provname from registry.dbo.vwRegionProvinceCityBarangay2 where regcode = '01'"
 
-   public function provinceByRegion(Request $r)
+    public function provinceByRegion(Request $r)
     {
-        $regionCode = $r->regcode; 
+        $regionCode = $r->regcode;
         // dd($regionCode);
-// FacadesLog::info('regioncode: ',  [$regionCode]);
+        // FacadesLog::info('regioncode: ',  [$regionCode]);
         $result = Cache::remember('provinceByRegion' . $regionCode, 3600, function () use ($regionCode) {
             return DB::table('registry.dbo.vwRegionProvinceCityBarangay2')
                 ->select('provcode', 'provname')
@@ -73,57 +85,57 @@ class GeneralServicesContoller extends Controller
         return $result;
     }
 
-// public function provinceByRegion(Request $r)
-// { 
-//     $regionCode = $r->regcode; 
+    // public function provinceByRegion(Request $r)
+    // { 
+    //     $regionCode = $r->regcode; 
 
-//     // Log the incoming region code
-//     FacadesLog::info('Region Code: ', [$regionCode]);
+    //     // Log the incoming region code
+    //     FacadesLog::info('Region Code: ', [$regionCode]);
 
-//     // Unique cache key
-//     $cacheKey = "provinceByRegion:{$regionCode}";
+    //     // Unique cache key
+    //     $cacheKey = "provinceByRegion:{$regionCode}";
 
-//     $result = Cache::remember($cacheKey, 3600, function () use ($regionCode) {
-//         return DB::table('bgh_libraries.demographics.ref_province')
-//             ->select('old_provcode', 'old_provname', 'provname','provcode')
-//             ->where('provcode', 'LIKE', "{$regionCode}%")  
-//             ->distinct()
-//             ->orderBy('provname', 'asc')
-//             ->get();
-//     });
+    //     $result = Cache::remember($cacheKey, 3600, function () use ($regionCode) {
+    //         return DB::table('bgh_libraries.demographics.ref_province')
+    //             ->select('old_provcode', 'old_provname', 'provname','provcode')
+    //             ->where('provcode', 'LIKE', "{$regionCode}%")  
+    //             ->distinct()
+    //             ->orderBy('provname', 'asc')
+    //             ->get();
+    //     });
 
-//     // Log the fetched provinces
-//     // FacadesLog::info('Provinces fetched: ', [$result]);
+    //     // Log the fetched provinces
+    //     // FacadesLog::info('Provinces fetched: ', [$result]);
 
-//     return $result;
-// }
-// public function provinceByRegion(Request $r)
-// {
-//     $regionCode = $r->regcode;
+    //     return $result;
+    // }
+    // public function provinceByRegion(Request $r)
+    // {
+    //     $regionCode = $r->regcode;
 
-//     // Unique cache key
-//     $cacheKey = "provinceByRegion:{$regionCode}";
+    //     // Unique cache key
+    //     $cacheKey = "provinceByRegion:{$regionCode}";
 
-//     $result = Cache::remember($cacheKey, 3600, function () use ($regionCode) {
-//         return DB::table('bgh_libraries.demographics.ref_province')
-//             ->select(
-//                 DB::raw('COALESCE(old_provcode, provcode) as old_provcode'),
-//                 'old_provname',
-//                 'provname',
-//                 'provcode'
-//             )
-//             ->where('provcode', 'LIKE', "{$regionCode}%")
-//             ->distinct()
-//             ->orderBy('provname', 'asc')
-//             ->get();
-//     });
+    //     $result = Cache::remember($cacheKey, 3600, function () use ($regionCode) {
+    //         return DB::table('bgh_libraries.demographics.ref_province')
+    //             ->select(
+    //                 DB::raw('COALESCE(old_provcode, provcode) as old_provcode'),
+    //                 'old_provname',
+    //                 'provname',
+    //                 'provcode'
+    //             )
+    //             ->where('provcode', 'LIKE', "{$regionCode}%")
+    //             ->distinct()
+    //             ->orderBy('provname', 'asc')
+    //             ->get();
+    //     });
 
-//     // Log the fetched provinces
-//     FacadesLog::info('region: ', [$regionCode]);
-//     FacadesLog::info('province: ', [$result]);
+    //     // Log the fetched provinces
+    //     FacadesLog::info('region: ', [$regionCode]);
+    //     FacadesLog::info('province: ', [$result]);
 
-//     return $result;
-// }
+    //     return $result;
+    // }
     public function cityByProvince(Request $r)
     {
 
@@ -143,28 +155,28 @@ class GeneralServicesContoller extends Controller
 
         return $result;
     }
-    
-// public function cityByProvince(Request $r)
-// { 
-//     $provcode = $r->provcode;
 
-//     // Unique cache key
-//     $cacheKey = "cityByProvince:{$provcode}";
+    // public function cityByProvince(Request $r)
+    // { 
+    //     $provcode = $r->provcode;
 
-//     $result = Cache::remember($cacheKey, 3600, function () use ($provcode) {
-//         return DB::table('bgh_libraries.demographics.ref_city')
-//             ->select('old_citycode', 'cityname')
-//             ->where('old_citycode', 'LIKE', "{$provcode}%")  
-//             ->distinct()
-//             ->orderBy('cityname', 'asc')
-//             ->get();
-//     });
+    //     // Unique cache key
+    //     $cacheKey = "cityByProvince:{$provcode}";
 
-//     // Log the result for debugging
-//     // FacadesLog::info('Cities fetched: ', [$result]);
+    //     $result = Cache::remember($cacheKey, 3600, function () use ($provcode) {
+    //         return DB::table('bgh_libraries.demographics.ref_city')
+    //             ->select('old_citycode', 'cityname')
+    //             ->where('old_citycode', 'LIKE', "{$provcode}%")  
+    //             ->distinct()
+    //             ->orderBy('cityname', 'asc')
+    //             ->get();
+    //     });
 
-//     return $result;
-// }
+    //     // Log the result for debugging
+    //     // FacadesLog::info('Cities fetched: ', [$result]);
+
+    //     return $result;
+    // }
 
 
     public function bgyByCity(Request $r)
@@ -187,27 +199,27 @@ class GeneralServicesContoller extends Controller
         return $result;
     }
 
-// public function bgyByCity(Request $r)
-// {
-//     $ctycode = $r->ctycode;
+    // public function bgyByCity(Request $r)
+    // {
+    //     $ctycode = $r->ctycode;
 
-//     // Use a unique cache key
-//     $cacheKey = "bgyByCity:{$ctycode}";
+    //     // Use a unique cache key
+    //     $cacheKey = "bgyByCity:{$ctycode}";
 
-//     $result = Cache::remember($cacheKey, 3600, function () use ($ctycode) {
-//         return DB::table('bgh_libraries.demographics.ref_barangay')
-//             ->select('old_bgycode', 'bgyname')
-//             ->where('old_bgycode', 'LIKE', "{$ctycode}%") // Improved readability
-//             ->distinct()
-//             ->orderBy('bgyname', 'asc')
-//             ->get();
-//     });
+    //     $result = Cache::remember($cacheKey, 3600, function () use ($ctycode) {
+    //         return DB::table('bgh_libraries.demographics.ref_barangay')
+    //             ->select('old_bgycode', 'bgyname')
+    //             ->where('old_bgycode', 'LIKE', "{$ctycode}%") // Improved readability
+    //             ->distinct()
+    //             ->orderBy('bgyname', 'asc')
+    //             ->get();
+    //     });
 
-//     // Log the result for debugging
-//     FacadesLog::info('Barangays fetched: ', [$result]);
+    //     // Log the result for debugging
+    //     FacadesLog::info('Barangays fetched: ', [$result]);
 
-//     return $result;
-// }
+    //     return $result;
+    // }
     //implement function to get unique regcode and regname from registry.dbo.vwRegionProvinceCityBarangay2
     public function regions(Request $r)
     {
@@ -233,21 +245,21 @@ class GeneralServicesContoller extends Controller
 
     // implement function get results for locationsByRegion then filter by Province
 
-// public function regions(Request $r)
-// {
-//     // Use the specified connection for the query
-//     $result = Cache::remember('regions', 3600, function () {
-//         return DB::table('bgh_libraries.demographics.ref_region') 
-//             ->select('old_regcode', 'regname')
-//             ->distinct()
-//             ->orderBy('regname', 'asc')
-//             ->get();
-//     });
-    
-//     FacadesLog::info('regions: ', [$result]);
-//     // dd($result);
-//     return $result;
-// }
+    // public function regions(Request $r)
+    // {
+    //     // Use the specified connection for the query
+    //     $result = Cache::remember('regions', 3600, function () {
+    //         return DB::table('bgh_libraries.demographics.ref_region') 
+    //             ->select('old_regcode', 'regname')
+    //             ->distinct()
+    //             ->orderBy('regname', 'asc')
+    //             ->get();
+    //     });
+
+    //     FacadesLog::info('regions: ', [$result]);
+    //     // dd($result);
+    //     return $result;
+    // }
 
     public function provinceByRegionDesc(Request $r)
     {
