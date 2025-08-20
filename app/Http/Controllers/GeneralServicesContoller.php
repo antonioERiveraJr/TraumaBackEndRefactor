@@ -16,7 +16,7 @@ class GeneralServicesContoller extends Controller
     public function locations(Request $r)
     {
         // dd('test');
-        //check if $r is in cache
+        // check if $r is in cache
 
         // Cache::remember('locations', 3600, function () {
         //     // return  DB::select("select * from registry.dbo.vwRegionProvinceCityBarangay2");
@@ -53,7 +53,7 @@ class GeneralServicesContoller extends Controller
         });
         return $result;
     }
-     
+
 
 
 
@@ -311,7 +311,7 @@ class GeneralServicesContoller extends Controller
             return response()->json($result);
         } catch (QueryException $e) {
             // Log the error
-            Log::error('Database error: ' . $e->getMessage());
+            // Log::error('Database error: ' . $e->getMessage());
 
             // Return a JSON response indicating an error
             return response()->json([

@@ -144,6 +144,9 @@ Route::group(
     }
 );
 
+//List of Unfinished Doctor's TSS Form
+Route::get('/getUnfinishedTSSForms', [App\Http\Controllers\InjuryServicesController::class, 'getUnfinishedTSSForms']);
+
 // moved export to unguarded
 Route::post('/getArrayFromFrontEnd', [App\Http\Controllers\InjuryServicesController::class, 'getArrayFromFrontEnd']);
 Route::post('/generateStatsToExcel', [App\Http\Controllers\InjuryServicesController::class, 'generateStatsToExcel']);

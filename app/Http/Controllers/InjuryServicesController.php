@@ -160,6 +160,13 @@ class InjuryServicesController extends Controller
     //     }
     // }
 
+    //unfinished Doctors TSS Forms
+    public function getUnfinishedTSSForms(REquest $r){
+        $result = DB::table('registry.injury.vwUnfinishedTSSList')
+            ->select('*')
+            ->get();   
+        return $result;
+    }
 
     // OLD TRAUMA SURVEILLANCE SYSTEM (TSS)
     public function injuryList3(Request $r)
@@ -214,6 +221,7 @@ class InjuryServicesController extends Controller
             return $uniqueResults;
         }
     }
+
 
     // NEW TSS
     public function injuryList(Request $r)
