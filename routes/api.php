@@ -28,6 +28,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/login', [AuthController::class, 'login']);
 // Route::post('/loginbyid', [AuthController::class, 'loginByID']);
 Route::get('/fromEMR', [AuthController::class, 'loginById']);
+Route::get('/fromOPD', [AuthController::class, 'loginOPD']);
+Route::get('/opdPatientData', [App\Http\Controllers\InjuryServicesController::class, 'opdPatientData']);
 // Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/test-cookie', function () {
@@ -91,6 +93,7 @@ Route::group(
 
 
 
+        Route::get('/checkPatientTSSRecord', [App\Http\Controllers\InjuryServicesController::class, 'checkPatientTSSRecord']);
         Route::get('/getEmployeeName', [App\Http\Controllers\InjuryServicesController::class, 'getEmployeeName']);
         Route::get('/getPatientReferral', [App\Http\Controllers\InjuryServicesController::class, 'getPatientReferral']);
 
@@ -107,6 +110,7 @@ Route::group(
         Route::put('/exportToExcelSaveData', [App\Http\Controllers\InjuryServicesController::class, 'exportToExcelSaveData']);
 
         Route::post('/saveData', [App\Http\Controllers\InjuryServicesController::class, 'saveData']);
+        Route::post('/saveOPDData', [App\Http\Controllers\InjuryServicesController::class, 'saveOPDData']);
         Route::get('/getLatestEntryOfDoctors', [App\Http\Controllers\InjuryServicesController::class, 'getLatestEntryOfDoctors']);
         // Route::get('/getLatestDiagnosis', [App\Http\Controllers\InjuryServicesController::class, 'getLatestDiagnosis']);
         Route::get('/getEntryOfDoctors', [App\Http\Controllers\InjuryServicesController::class, 'getEntryOfDoctors']);
@@ -121,6 +125,7 @@ Route::group(
         Route::post('/removeFromRegistry', [App\Http\Controllers\InjuryServicesController::class, 'removeFromRegistry']);
         Route::get('/generateStats', [App\Http\Controllers\InjuryServicesController::class, 'generateStats']);
         Route::get('/getListOfDiagnosis', [App\Http\Controllers\InjuryServicesController::class, 'getListOfDiagnosis']);
+        Route::get('/getListOfFinalDiagnosis', [App\Http\Controllers\InjuryServicesController::class, 'getListOfFinalDiagnosis']);
 
         // Route::post('/generateStatsToExcel', [App\Http\Controllers\InjuryServicesController::class, 'generateStatsToExcel']);
 

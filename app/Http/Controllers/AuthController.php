@@ -49,8 +49,8 @@ class AuthController extends Controller
         */
         // $response = redirect("http://192.168.7.66/#/injury/PatientFromEMR?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
         // $response = redirect("http://192.168.6.58:62043/#/injury/PatientFromEMR?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
-       $response = redirect("http://localhost:5173/#/injury/PatientFromEMR?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
-      
+        $response = redirect("http://localhost:5173/#/injury/PatientFromEMR?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
+
         // dd($response);
         // $response = redirect("https://192.168.7.66/#/injury/PatientFromEMR?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
         // $response = redirect("https://192.168.7.66/#/injury?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}");
@@ -80,7 +80,21 @@ class AuthController extends Controller
         //     'enccode' => $r->enccode
         // ];
     }
+    public function loginOPD(Request $r)
+    {
+        $creds = $this->setCredsByEmpID($r->empID);
+        $loginRequest = new LoginUserRequest([
+            'username' => $creds->user_name,
+            'password' => $creds->user_pass
+        ]);
+        $loginRequest['enccode'] = $r->enccode;
+        $token = $this->login($loginRequest);
+        $array = $token->getData(true);
+        // $response = redirect("http://localhost:5173/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
+        $response = redirect("http://192.168.6.58:81/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
 
+        return $response;
+    }
 
     // public function setCredsByEmpID(request $r){
     public function setCredsByEmpID(string $empID)

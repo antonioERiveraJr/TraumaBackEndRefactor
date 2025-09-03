@@ -49,7 +49,7 @@ class GeneralServicesContoller extends Controller
     public function newlocations(Request $r)
     {
         $result = Cache::remember('newlocations', 3600, function () {
-            return DB::select('exec registry.dbo.getLocations');
+            return DB::select('exec registry.dbo.getONEISSLocations');
         });
         return $result;
     }
