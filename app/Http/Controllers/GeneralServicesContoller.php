@@ -12,7 +12,6 @@ class GeneralServicesContoller extends Controller
 {
     use HttpResponses;
 
-
     public function locations(Request $r)
     {
         // dd('test');

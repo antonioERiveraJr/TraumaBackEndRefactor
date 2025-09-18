@@ -161,10 +161,11 @@ class InjuryServicesController extends Controller
     // }
 
     //unfinished Doctors TSS Forms
-    public function getUnfinishedTSSForms(REquest $r){
+    public function getUnfinishedTSSForms(REquest $r)
+    {
         $result = DB::table('registry.injury.vwUnfinishedTSSList')
             ->select('*')
-            ->get();   
+            ->get();
         return $result;
     }
 
@@ -796,11 +797,11 @@ class InjuryServicesController extends Controller
     // }
 
     public function saveOPDData(Request $r)
-    { 
+    {
         $result = [];
         try {
             $result = DB::select("exec registry.dbo.saveOPDDataJSON ? ", [$r->formattedData]);
-            if (isset($result[0]) && isset($result[0]->enccode)) { 
+            if (isset($result[0]) && isset($result[0]->enccode)) {
                 $result[0]->status = 200;
                 return $this->success($result, 'Success', 200);
             }
@@ -1060,7 +1061,7 @@ class InjuryServicesController extends Controller
             //     'all' => $r->all
             // ]);
             // update when latest form and same ID
-            if ($r->isUpdateForm) {
+            if ($r->isUpdateForm) { 
                 $result = DB::table('hospital.dbo.ufive_cli_finding')
                     ->where('id', $r->ufiveID)
                     ->where('enccode', $r->enccode)
@@ -1246,13 +1247,13 @@ class InjuryServicesController extends Controller
             return response()->json([]);
         }
     }
-       public function getListOfFinalDiagnosis(Request $r)
+    public function getListOfFinalDiagnosis(Request $r)
     {
-        try { 
+        try {
             $result = DB::table('hospital.dbo.hencdiag')
-                ->select('diagtext', 'enctime', 'tdcode' )
+                ->select('diagtext', 'enctime', 'tdcode')
                 ->where('enccode', $r->admEnccode)
-                ->where('tdcode','=','FINDX')
+                ->where('tdcode', '=', 'FINDX')
                 ->get();
             return $result;
         } catch (\Exception $e) {
@@ -1384,11 +1385,12 @@ class InjuryServicesController extends Controller
         }
     }
 
-     public function checkPatientTSSRecord(Request $r){
+    public function checkPatientTSSRecord(Request $r)
+    {
         $patientsData = DB::table('registry.dbo.opdDataJSON')
-        ->select('data')
-        ->where('hpercode', '=', $r->hpercode) 
-        ->get();
+            ->select('data')
+            ->where('hpercode', '=', $r->hpercode)
+            ->get();
 
         return $patientsData;
     }
@@ -1436,13 +1438,35 @@ class InjuryServicesController extends Controller
         return $response;
     }
 
-   
+
+    // public function opdPatientData(Request $r)
+    // { 
+    //     // dd($r->enccode);
+    //     $result = DB::select('exec registry.injury.GetInjuryPatientByEnccode ?', [$r->enccode]);
+
+    //     return response()->json($result[0]);
+    // }
+
     public function opdPatientData(Request $r)
     { 
-        // dd($r->enccode);
         $result = DB::select('exec registry.injury.GetInjuryPatientByEnccode ?', [$r->enccode]);
+ 
+        if (empty($result)) {
+            return response()->json(['message' => 'No data found'], 404);
+        }
+ 
+        $decodedData = json_decode($result[0]->data);  
+ 
+        $responseData = [
+            'patientname' => $result[0]->patientname,
+            'hpercode' => $result[0]->hpercode,
+            'enccode' => $result[0]->enccode,
+            'opdtime' => $result[0]->opdtime,
+            'patientbirthdate' => $result[0]->patientbirthdate,
+            'data' => $decodedData,  
+        ];
 
-        return response()->json($result[0]);
+        return response()->json($responseData);
     }
 
     public function getSubjectiveNoiToiPoiDoi(Request $r)
@@ -1692,7 +1716,7 @@ class InjuryServicesController extends Controller
         $csvObject->disp_inpat = $rowToExport->header->disp_inpat ?? '';
         $complete_diagnosis = $rowToExport->header->complete_diagnosis ?? '';
         if (!empty($rowToExport->details->hospitalFacilityData->customizedFinalDiagnosis)) {
-            $complete_diagnosis = $rowToExport->details->hospitalFacilityData->customizedFinalDiagnosis; 
+            $complete_diagnosis = $rowToExport->details->hospitalFacilityData->customizedFinalDiagnosis;
         }
         $csvObject->complete_diagnosis = $complete_diagnosis;
 
@@ -1800,8 +1824,8 @@ class InjuryServicesController extends Controller
         if (($rowToExport->details->ExternalCauseOfInjury->vawc ?? null) === 'Y') {
             $diagnosis .= "\n-VAWC"; // Append 'VAWC' to the diagnosis
         }
-         if (!empty($rowToExport->details->hospitalFacilityData->customizedDiagnosis)) {
-            $diagnosis = $rowToExport->details->hospitalFacilityData->customizedDiagnosis; 
+        if (!empty($rowToExport->details->hospitalFacilityData->customizedDiagnosis)) {
+            $diagnosis = $rowToExport->details->hospitalFacilityData->customizedDiagnosis;
         }
         //already in automated diagnosis
         // if (($rowToExport->details->ExternalCauseOfInjury->vawc ?? null) === 'Y') {
