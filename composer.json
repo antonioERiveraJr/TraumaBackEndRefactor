@@ -13,7 +13,8 @@
         "itsgoingd/clockwork": "^5.1",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",
-        "laravel/tinker": "^2.7" 
+        "laravel/tinker": "^2.7",
+        "opcodesio/log-viewer": "^3.19"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

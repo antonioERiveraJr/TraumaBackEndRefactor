@@ -54,8 +54,6 @@ class GeneralServicesContoller extends Controller
     }
 
 
-
-
     //implement function to get unique RegionCode and RegionDesc for locations
 
 

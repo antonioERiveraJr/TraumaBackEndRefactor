@@ -102,7 +102,9 @@ Route::group(
         Route::post('/injuryListDev', [App\Http\Controllers\InjuryServicesController::class, 'injuryListDev']);
         Route::get('/injuryList2', [App\Http\Controllers\InjuryServicesController::class, 'injuryList2']);
         Route::post('/injuryList3', [App\Http\Controllers\InjuryServicesController::class, 'injuryList3']);
+        Route::post('/admittedInjuryList', [App\Http\Controllers\InjuryServicesController::class, 'admittedInjuryList']);
         Route::get('/injuryList/{enccode}', [App\Http\Controllers\InjuryServicesController::class, 'injuryPatient']);
+        Route::get('/admittedInjuryListData/{enccode}', [App\Http\Controllers\InjuryServicesController::class, 'admittedInjuryListData']);
         Route::get('/injuryListDev/{enccode}', [App\Http\Controllers\InjuryServicesController::class, 'injuryPatientDev']);
         Route::get('/injuryListNoData/{enccode}', [App\Http\Controllers\InjuryServicesController::class, 'injuryPatientNoData']);
         Route::get('/injuryList2/{enccode}', [App\Http\Controllers\InjuryServicesController::class, 'injuryPatient2']);

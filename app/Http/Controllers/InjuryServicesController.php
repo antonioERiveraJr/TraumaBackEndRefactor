@@ -223,6 +223,32 @@ class InjuryServicesController extends Controller
         }
     }
 
+    // exporting admitted patients List
+    public function admittedInjuryList(Request $r)
+    {
+
+        $result = DB::table('registry.injury.vwAdmittedInjuryPatient')
+            ->select('enccode', 'header', 'status', 'details', 'tStamp', 'admdate', 'injtme', 'primediag', 'archdate')
+            // ->where('primediag', '=', 'Y')
+            ->where('status', $r->status)
+            // ->where('primediag', '=', null, 'and', 'primediag', '=', 'Y')
+            ->where(function ($query) {
+                $query->where('primediag', '=', null)
+                    ->orWhere('primediag', '=', 'Y');
+            })
+            // ->distinct()
+            ->get();
+        // FacadesLog::info('inj list: ', [$result]);
+        $uniqueResults = $result->unique('enccode');
+        foreach ($uniqueResults as $res) {
+            $res->header = json_decode($res->header)[0];
+            $res->details = json_decode($res->details);
+        }
+        Cache::put('injuryList', $uniqueResults, 3600);
+
+        return $uniqueResults;
+    }
+
 
     // NEW TSS
     public function injuryList(Request $r)
@@ -556,11 +582,30 @@ class InjuryServicesController extends Controller
             return $this->injuryPatientDevNoData($r);
         }
     }
+    public function admittedInjuryListData(Request $r)
+    {
 
+        try {
+            $result = DB::select("SELECT header,enccode,details from registry.injury.vwAdmittedInjuryPatient where enccode = '$r->enccode' and (primediag = 'Y' or primediag is null)");
+
+
+            if (count($result)) {
+
+                $result = $result[0];
+                $result->header = json_decode($result->header)[0];
+                $result->details = json_decode($result->details);
+
+                return $result;
+            }
+        } catch (\Exception $e) {
+
+
+            return $this->error($e->getMessage(), 'Error', 500);
+        }
+    }
 
     public function injuryPatientDev(Request $r)
     {
-
         // $key = $r->enccode;
         // // check if $result is in cache
         // if (Cache::has($key)) {
@@ -795,6 +840,27 @@ class InjuryServicesController extends Controller
     //         return $this->error($e->getMessage(), 'Error', 500);
     //     }
     // }
+
+    public function getAdmittedList(Request $r)
+    {
+        $result = [];
+        try {
+            $result = DB::select("exec registry.injury.GetInjuryPatientData ? ", [$r->status]);
+            if (isset($result[0]) && isset($result[0]->enccode)) {
+                $result[0]->status = 200;
+                return $this->success($result, 'Success', 200);
+            }
+        } catch (Exception $e) {
+            if (isset($result[0]) && isset($result[0]->invalidEnccode) && $result[0]->invalidEnccode) {
+                return $this->error($result, 'Invalid enccode', 500);
+            }
+            if (isset($result[0]) && isset($result[0]->invalidJson) && $result[0]->invalidJson) {
+                return $this->error($result, 'Invalid JSON', 500);
+            }
+            return $this->error($e->getMessage(), 'Error', 500);
+        }
+        return $result;
+    }
 
     public function saveOPDData(Request $r)
     {
@@ -1061,7 +1127,7 @@ class InjuryServicesController extends Controller
             //     'all' => $r->all
             // ]);
             // update when latest form and same ID
-            if ($r->isUpdateForm) { 
+            if ($r->isUpdateForm) {
                 $result = DB::table('hospital.dbo.ufive_cli_finding')
                     ->where('id', $r->ufiveID)
                     ->where('enccode', $r->enccode)
@@ -1448,22 +1514,22 @@ class InjuryServicesController extends Controller
     // }
 
     public function opdPatientData(Request $r)
-    { 
+    {
         $result = DB::select('exec registry.injury.GetInjuryPatientByEnccode ?', [$r->enccode]);
- 
+
         if (empty($result)) {
             return response()->json(['message' => 'No data found'], 404);
         }
- 
-        $decodedData = json_decode($result[0]->data);  
- 
+
+        $decodedData = json_decode($result[0]->data);
+
         $responseData = [
             'patientname' => $result[0]->patientname,
             'hpercode' => $result[0]->hpercode,
             'enccode' => $result[0]->enccode,
             'opdtime' => $result[0]->opdtime,
             'patientbirthdate' => $result[0]->patientbirthdate,
-            'data' => $decodedData,  
+            'data' => $decodedData,
         ];
 
         return response()->json($responseData);
@@ -1631,6 +1697,7 @@ class InjuryServicesController extends Controller
             $newdata[] = $this->formatEnccodeDataForCSV($r);
         }
 
+
         $csvFileName = 'Injury.csv';
         $zipFileName = 'Injury.zip';
         // dd('here');
@@ -1672,9 +1739,16 @@ class InjuryServicesController extends Controller
     {
 
         // return $this->injuryPatient($r);
+        // console.log(is);
+        // dd($r->isAdmit);
+        if ($r->isAdmit === true) {
+            $rowToExport = $this->admittedInjuryListData($r);
+        // FacadesLog::info(message: ['nganiii ', $r->all]);
+        } else {
+            $rowToExport = $this->injuryPatientDev($r);
+        }
 
-        $rowToExport = $this->injuryPatientDev($r);
-        // FacadesLog::info(['rowToExport: ', $rowToExport]);
+        FacadesLog::info(['data: ', $r->all]);
         // return $rowToExport;
 
         $csvObject = new stdClass();
@@ -1713,7 +1787,17 @@ class InjuryServicesController extends Controller
             'UNIMP' => 20,
             default => null,
         };
-        $csvObject->disp_inpat = $rowToExport->header->disp_inpat ?? '';
+
+          $csvObject->disp_inpat = match ($rowToExport->header->disp_inpat ?? '') {
+            'ABSC' => 'ABSCN',
+            'DIED' => 'DIEDD',
+            'DISCH' => 'DISCH',
+            'DAMA' => 'DISCH',
+            'TRANS' => 'REFER',
+            'oth' => 'oth',
+            default => null,
+        };
+        // $csvObject->disp_inpat = $rowToExport->header->disp_inpat ?? '';
         $complete_diagnosis = $rowToExport->header->complete_diagnosis ?? '';
         if (!empty($rowToExport->details->hospitalFacilityData->customizedFinalDiagnosis)) {
             $complete_diagnosis = $rowToExport->details->hospitalFacilityData->customizedFinalDiagnosis;
