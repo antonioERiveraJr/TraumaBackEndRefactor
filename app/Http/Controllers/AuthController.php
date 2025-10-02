@@ -31,7 +31,7 @@ class AuthController extends Controller
         $loginRequest = new LoginUserRequest([
             'username' => $creds->user_name,
             'password' => $creds->user_pass
-        ]);
+        ]); 
         // $loginRequest->enccode = $r->enccode;
         $loginRequest['enccode'] = $r->enccode;
         // return $loginRequest;

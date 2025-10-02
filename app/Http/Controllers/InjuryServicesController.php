@@ -1688,13 +1688,16 @@ class InjuryServicesController extends Controller
     }
     public function getArrayFromFrontEnd(Request $r)
     {
-        FacadesLog::info(['received data: ', $r->all]);
+        // FacadesLog::info(['rolling: ', $r]);
+
+        // FacadesLog::info(['rolling: ', $r->request->get('isAdmit')]); 
+        $isAdmit = $r->request->get('isAdmit');
         $newdata = [];
         $data = $r->array;
 
         foreach ($data as $d) {
             $r->replace($d);
-            $newdata[] = $this->formatEnccodeDataForCSV($r);
+            $newdata[] = $this->formatEnccodeDataForCSV($r,$isAdmit );
         }
 
 
@@ -1735,20 +1738,24 @@ class InjuryServicesController extends Controller
         }
     }
 
-    public function formatEnccodeDataForCSV(Request $r)
+    public function formatEnccodeDataForCSV(Request $r, $isAdmit)
     {
 
         // return $this->injuryPatient($r);
         // console.log(is);
         // dd($r->isAdmit);
-        if ($r->isAdmit === true) {
+        // FacadesLog::info(message: ['nganiii ',$r->request->get('isAdmit')]);
+        // Get the isAdmit value
+
+        // FacadesLog::info(['nganiii ', $isAdmit]);
+        if ($isAdmit === TRUE) {
             $rowToExport = $this->admittedInjuryListData($r);
-        // FacadesLog::info(message: ['nganiii ', $r->all]);
+            // FacadesLog::info(message: ['nganiii ', $r->all]);
         } else {
             $rowToExport = $this->injuryPatientDev($r);
         }
 
-        FacadesLog::info(['data: ', $r->all]);
+        // FacadesLog::info(['data: ', $r->all]);
         // return $rowToExport;
 
         $csvObject = new stdClass();
@@ -1788,7 +1795,7 @@ class InjuryServicesController extends Controller
             default => null,
         };
 
-          $csvObject->disp_inpat = match ($rowToExport->header->disp_inpat ?? '') {
+        $csvObject->disp_inpat = match ($rowToExport->header->disp_inpat ?? '') {
             'ABSC' => 'ABSCN',
             'DIED' => 'DIEDD',
             'DISCH' => 'DISCH',
