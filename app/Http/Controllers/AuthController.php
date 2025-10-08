@@ -90,7 +90,8 @@ class AuthController extends Controller
         $loginRequest['enccode'] = $r->enccode;
         $token = $this->login($loginRequest);
         $array = $token->getData(true);
-        $response = redirect("http://localhost:5173/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
+        // $response = redirect("http://localhost:5173/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
+        $response = redirect("http://192.168.6.58:61170/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
         // $response = redirect("http://192.168.6.58:81/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
 
         return $response;
@@ -270,9 +271,6 @@ class AuthController extends Controller
             ->where('ua.user_name', $r->user()->name)
             ->get();
         $result[0]->user_access = $user_access;
-
-
-
 
 
         return count($result) > 0 ? $result[0] : $this->error('', `hospital.dbo.user_acc: User '$r->user()->name' does not exist`, 500);

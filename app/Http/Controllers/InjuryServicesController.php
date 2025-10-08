@@ -1451,15 +1451,37 @@ class InjuryServicesController extends Controller
         }
     }
 
-    public function checkPatientTSSRecord(Request $r)
-    {
-        $patientsData = DB::table('registry.dbo.opdDataJSON')
-            ->select('data')
-            ->where('hpercode', '=', $r->hpercode)
-            ->get();
+    // public function checkPatientTSSRecord(Request $r)
+    // {
+    //     $patientsData = DB::table('registry.dbo.opdDataJSON')
+    //         ->select('data', 'vaccineday')
+    //         ->where('hpercode', '=', $r->hpercode)
+    //         ->get();
 
-        return $patientsData;
+    //     return $patientsData;
+    // }
+
+    public function checkPatientTSSRecord(Request $r)
+{ 
+    $patientsData = DB::table('registry.dbo.opdDataJSON')
+        ->select('data', 'vaccineday', 'tStamp', 'primeTSS')
+        ->where('hpercode', '=', $r->hpercode)
+        ->get();
+ 
+    $decodedData = [];
+ 
+    foreach ($patientsData as $patient) {
+        // Decode the JSON data
+        $decodedData[] = [
+            'vaccineday' => $patient->vaccineday,
+            'data' => json_decode($patient->data),
+            'tStamp' => $patient->tStamp,
+            'primeTSS' => $patient->primeTSS
+        ];
     }
+
+    return $decodedData;
+}
 
     public function getEmployeeName(Request $r)
     {
@@ -1530,6 +1552,7 @@ class InjuryServicesController extends Controller
             'opdtime' => $result[0]->opdtime,
             'patientbirthdate' => $result[0]->patientbirthdate,
             'data' => $decodedData,
+            'vaccineday' => $result[0]->vaccineday,
         ];
 
         return response()->json($responseData);
