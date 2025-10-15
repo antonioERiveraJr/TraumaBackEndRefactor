@@ -119,6 +119,7 @@ Route::group(
         Route::get('/getFormDetail', [App\Http\Controllers\InjuryServicesController::class, 'getFormDetail']);
         Route::get('/getFormDetail', [App\Http\Controllers\InjuryServicesController::class, 'getFormDetail']);
         Route::put('/updateStatusForArchived', [App\Http\Controllers\InjuryServicesController::class, 'updateStatusForArchived']);
+        Route::put('/newCase', [App\Http\Controllers\InjuryServicesController::class, 'newCase']);
         Route::put('/insertObjSubj', [App\Http\Controllers\InjuryServicesController::class, 'insertObjSubj']);
         Route::put('/updateMedilogs', [App\Http\Controllers\InjuryServicesController::class, 'updateMedilogs']);
         Route::put('/insertBillingDiagnosis', [App\Http\Controllers\InjuryServicesController::class, 'insertBillingDiagnosis']);

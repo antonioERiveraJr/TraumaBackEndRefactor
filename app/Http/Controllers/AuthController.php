@@ -90,8 +90,8 @@ class AuthController extends Controller
         $loginRequest['enccode'] = $r->enccode;
         $token = $this->login($loginRequest);
         $array = $token->getData(true);
-        // $response = redirect("http://localhost:5173/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
-        $response = redirect("http://192.168.6.58:61170/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
+        $response = redirect("http://localhost:5173/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
+        // $response = redirect("http://192.168.6.58:51148/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
         // $response = redirect("http://192.168.6.58:81/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
 
         return $response;
@@ -101,7 +101,7 @@ class AuthController extends Controller
     public function setCredsByEmpID(string $empID)
     {
         // return $empID;
-        // $result = DB::table(('hospital.dbo.user_acc as ua'))
+        // $result = DB::table(('hospital.dbo.user_acc as ua'))how t
         // ->select('user_name', 'webapp.dbo.ufn_crypto(webapp.dbo.ufn_crypto(user_pass ,1) ,0) as user_pass')
         // ->where('employeeid', '=', $r->empID)
         // ->get();

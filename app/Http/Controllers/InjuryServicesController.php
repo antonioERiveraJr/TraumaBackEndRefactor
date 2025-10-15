@@ -1184,7 +1184,23 @@ class InjuryServicesController extends Controller
     //         return $this->error($e->getMessage(), 'Error', 500);
     //     }
     // }
+    function newCase(Request $r)
+    {
+        try {
+            $result = DB::table('registry.dbo.opdDataJSON')
+                ->where('hpercode', '=', $r->hpercode)
+                ->where('lockCase','=', null)
+                ->update([
+                    'lockCase' => now() 
+                ]);
 
+            if ($result) {
+                return $this->success($result, 'Success', 200);
+            }
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 'Error', 500);
+        }
+    }
 
     function updateMedilogs(Request $r)
     {
@@ -1461,21 +1477,43 @@ class InjuryServicesController extends Controller
     //     return $patientsData;
     // }
 
-    public function checkPatientTSSRecord(Request $r)
+//     public function checkPatientTSSRecord(Request $r)
+// { 
+//     $patientsData = DB::table('registry.dbo.opdDataJSON')
+//         ->select('data', 'vaccineday', 'tStamp', 'primeTSS')
+//         ->where('hpercode', '=', $r->hpercode)
+//         ->get();
+ 
+//     $decodedData = [];
+ 
+//     foreach ($patientsData as $patient) {
+//         // Decode the JSON data
+//         $decodedData[] = [
+//             'vaccineday' => $patient->vaccineday,
+//             'data' => json_decode($patient->data),
+//             'tStamp' => $patient->tStamp,
+//             'primeTSS' => $patient->primeTSS
+//         ];
+//     }
+
+//     return $decodedData;
+// }
+public function checkPatientTSSRecord(Request $r)
 { 
     $patientsData = DB::table('registry.dbo.opdDataJSON')
         ->select('data', 'vaccineday', 'tStamp', 'primeTSS')
         ->where('hpercode', '=', $r->hpercode)
+        ->where('lockCase','=', null)
         ->get();
  
     $decodedData = [];
  
     foreach ($patientsData as $patient) {
-        // Decode the JSON data
+        // Decode the JSON data and format the tStamp
         $decodedData[] = [
             'vaccineday' => $patient->vaccineday,
             'data' => json_decode($patient->data),
-            'tStamp' => $patient->tStamp,
+            'tStamp' => Carbon::parse($patient->tStamp)->format('Y-m-d'), // Format to 'YYYY-MM-DD'
             'primeTSS' => $patient->primeTSS
         ];
     }
@@ -1553,6 +1591,7 @@ class InjuryServicesController extends Controller
             'patientbirthdate' => $result[0]->patientbirthdate,
             'data' => $decodedData,
             'vaccineday' => $result[0]->vaccineday,
+            'lockCase' => $result[0]->lockCase
         ];
 
         return response()->json($responseData);
