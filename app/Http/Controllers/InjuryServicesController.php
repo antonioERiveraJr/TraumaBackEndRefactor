@@ -1501,10 +1501,11 @@ class InjuryServicesController extends Controller
 public function checkPatientTSSRecord(Request $r)
 { 
     $patientsData = DB::table('registry.dbo.opdDataJSON')
-        ->select('data', 'vaccineday', 'tStamp', 'primeTSS')
+        ->select('data', 'vaccineday', 'tStamp', 'primeTSS', 'prophylaxis')
         ->where('hpercode', '=', $r->hpercode)
         ->where('lockCase','=', null)
-        ->get();
+        ->where('prophylaxis', '=', $r->prophylaxis)
+        ->get();  
  
     $decodedData = [];
  
@@ -1514,7 +1515,8 @@ public function checkPatientTSSRecord(Request $r)
             'vaccineday' => $patient->vaccineday,
             'data' => json_decode($patient->data),
             'tStamp' => Carbon::parse($patient->tStamp)->format('Y-m-d'), // Format to 'YYYY-MM-DD'
-            'primeTSS' => $patient->primeTSS
+            'primeTSS' => $patient->primeTSS,
+            'prophylaxis' => $patient->prophylaxis
         ];
     }
 
