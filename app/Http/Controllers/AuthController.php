@@ -108,7 +108,6 @@ class AuthController extends Controller
 
         // return $result;
 
-
         $result = DB::table('hospital.dbo.user_acc as ua')
             // ->select('ua.user_name', DB::raw("webapp.dbo.ufn_crypto(webapp.dbo.ufn_crypto('ua.user_pass' ,1) ,0) as user_pass"))
             // ->select('ua.user_name', DB::raw("webapp.dbo.ufn_crypto('0' ,1) as user_pass"))

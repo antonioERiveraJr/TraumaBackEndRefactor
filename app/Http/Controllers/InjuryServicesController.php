@@ -32,6 +32,7 @@ use App\Exports\InjuryExport;
 // use Illuminate\Container\Attributes\Log;
 
 class InjuryServicesController extends Controller
+
 {
     use HttpResponses;
     // public function injuryList(Request $r)
@@ -1189,9 +1190,9 @@ class InjuryServicesController extends Controller
         try {
             $result = DB::table('registry.dbo.opdDataJSON')
                 ->where('hpercode', '=', $r->hpercode)
-                ->where('lockCase','=', null)
+                ->where('lockCase', '=', null)
                 ->update([
-                    'lockCase' => now() 
+                    'lockCase' => now()
                 ]);
 
             if ($result) {
@@ -1477,51 +1478,51 @@ class InjuryServicesController extends Controller
     //     return $patientsData;
     // }
 
-//     public function checkPatientTSSRecord(Request $r)
-// { 
-//     $patientsData = DB::table('registry.dbo.opdDataJSON')
-//         ->select('data', 'vaccineday', 'tStamp', 'primeTSS')
-//         ->where('hpercode', '=', $r->hpercode)
-//         ->get();
- 
-//     $decodedData = [];
- 
-//     foreach ($patientsData as $patient) {
-//         // Decode the JSON data
-//         $decodedData[] = [
-//             'vaccineday' => $patient->vaccineday,
-//             'data' => json_decode($patient->data),
-//             'tStamp' => $patient->tStamp,
-//             'primeTSS' => $patient->primeTSS
-//         ];
-//     }
+    //     public function checkPatientTSSRecord(Request $r)
+    // { 
+    //     $patientsData = DB::table('registry.dbo.opdDataJSON')
+    //         ->select('data', 'vaccineday', 'tStamp', 'primeTSS')
+    //         ->where('hpercode', '=', $r->hpercode)
+    //         ->get();
 
-//     return $decodedData;
-// }
-public function checkPatientTSSRecord(Request $r)
-{ 
-    $patientsData = DB::table('registry.dbo.opdDataJSON')
-        ->select('data', 'vaccineday', 'tStamp', 'primeTSS', 'prophylaxis')
-        ->where('hpercode', '=', $r->hpercode)
-        ->where('lockCase','=', null)
-        ->where('prophylaxis', '=', $r->prophylaxis)
-        ->get();  
- 
-    $decodedData = [];
- 
-    foreach ($patientsData as $patient) {
-        // Decode the JSON data and format the tStamp
-        $decodedData[] = [
-            'vaccineday' => $patient->vaccineday,
-            'data' => json_decode($patient->data),
-            'tStamp' => Carbon::parse($patient->tStamp)->format('Y-m-d'), // Format to 'YYYY-MM-DD'
-            'primeTSS' => $patient->primeTSS,
-            'prophylaxis' => $patient->prophylaxis
-        ];
+    //     $decodedData = [];
+
+    //     foreach ($patientsData as $patient) {
+    //         // Decode the JSON data
+    //         $decodedData[] = [
+    //             'vaccineday' => $patient->vaccineday,
+    //             'data' => json_decode($patient->data),
+    //             'tStamp' => $patient->tStamp,
+    //             'primeTSS' => $patient->primeTSS
+    //         ];
+    //     }
+
+    //     return $decodedData;
+    // }
+    public function checkPatientTSSRecord(Request $r)
+    {
+        $patientsData = DB::table('registry.dbo.opdDataJSON')
+            ->select('data', 'vaccineday', 'tStamp', 'primeTSS', 'prophylaxis')
+            ->where('hpercode', '=', $r->hpercode)
+            ->where('lockCase', '=', null)
+            ->where('prophylaxis', '=', $r->prophylaxis)
+            ->get();
+
+        $decodedData = [];
+
+        foreach ($patientsData as $patient) {
+            // Decode the JSON data and format the tStamp
+            $decodedData[] = [
+                'vaccineday' => $patient->vaccineday,
+                'data' => json_decode($patient->data),
+                'tStamp' => Carbon::parse($patient->tStamp)->format('Y-m-d'), // Format to 'YYYY-MM-DD'
+                'primeTSS' => $patient->primeTSS,
+                'prophylaxis' => $patient->prophylaxis
+            ];
+        }
+
+        return $decodedData;
     }
-
-    return $decodedData;
-}
 
     public function getEmployeeName(Request $r)
     {
@@ -1574,6 +1575,18 @@ public function checkPatientTSSRecord(Request $r)
 
     //     return response()->json($result[0]);
     // }
+
+    public function getPatientABTCLog(Request $r)
+    {
+        $response = DB::table('registry.dbo.opdDataJSON')
+            ->select('*')   
+            ->where('hpercode', '=', $r->hpercode)
+            ->where('lockCase','!=', null)
+            ->get();
+
+
+        return $response;
+    }
 
     public function opdPatientData(Request $r)
     {
@@ -1761,7 +1774,7 @@ public function checkPatientTSSRecord(Request $r)
 
         foreach ($data as $d) {
             $r->replace($d);
-            $newdata[] = $this->formatEnccodeDataForCSV($r,$isAdmit );
+            $newdata[] = $this->formatEnccodeDataForCSV($r, $isAdmit);
         }
 
 

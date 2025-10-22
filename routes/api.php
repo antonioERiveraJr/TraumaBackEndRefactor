@@ -113,6 +113,7 @@ Route::group(
 
         Route::post('/saveData', [App\Http\Controllers\InjuryServicesController::class, 'saveData']);
         Route::post('/saveOPDData', [App\Http\Controllers\InjuryServicesController::class, 'saveOPDData']);
+        Route::get('/getPatientABTCLog', [App\Http\Controllers\InjuryServicesController::class, 'getPatientABTCLog']);
         Route::get('/getLatestEntryOfDoctors', [App\Http\Controllers\InjuryServicesController::class, 'getLatestEntryOfDoctors']);
         // Route::get('/getLatestDiagnosis', [App\Http\Controllers\InjuryServicesController::class, 'getLatestDiagnosis']);
         Route::get('/getEntryOfDoctors', [App\Http\Controllers\InjuryServicesController::class, 'getEntryOfDoctors']);
