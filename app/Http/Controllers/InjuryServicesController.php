@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Log as FacadesLog;
 use Illuminate\Support\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\InjuryExport;
+use PDF; // Import the PDF facade
 // use Illuminate\Container\Attributes\Log;
 
 class InjuryServicesController extends Controller
@@ -171,6 +172,59 @@ class InjuryServicesController extends Controller
     }
 
     // OLD TRAUMA SURVEILLANCE SYSTEM (TSS)
+    // public function injuryList3(Request $r)
+    // {
+    //     if ($r->hardRefresh == null) {
+    //         $r->hardRefresh = false;
+    //     }
+    //     if ($r->hardRefresh) {
+    //         Cache::forget('injuryList3');
+    //     }
+    //     if (Cache::has('injuryList3')) {
+    //         $result = Cache::get('injuryList3');
+    //         return $result;
+    //     } else {
+    //         if (is_null($r->startdate) && is_null($r->enddate)) {
+    //             $startDate = now()->subDays(7)->format('m/d/Y');
+    //             $endDate = now()->format('m/d/Y');
+    //         } else {
+    //             $startDate = $r->startdate;
+    //             $endDate = $r->enddate;
+    //         }
+    //         $datedescription = $r->dateDescription;
+
+    //         if ($r->dateDescription === 'Date of Consultation') {
+    //             $datedescription = 'admdate';
+    //         } else {
+    //             $datedescription = 'injtme';
+    //         }
+
+    //         $result = DB::table('registry.injury.vwInjuryPatient')
+    //             ->select('enccode', 'header', 'status', 'details', 'tStamp', 'admdate', 'injtme', 'primediag')
+    //             ->whereDate($datedescription, '>=', $startDate)
+    //             ->whereDate($datedescription, '<=', $endDate)
+    //             // ->where('primediag', '=', 'Y')
+    //             ->where('status', $r->status)
+    //             // ->where('primediag', '=', null, 'and', 'primediag', '=', 'Y')
+    //             ->where(function ($query) {
+    //                 $query->where('primediag', '=', null)
+    //                     ->orWhere('primediag', '=', 'Y');
+    //             })
+    //             ->orderByDesc($datedescription)
+    //             // ->distinct()
+    //             ->get();
+    //         // FacadesLog::info('inj list: ', [$result]);
+    //         $uniqueResults = $result->unique('enccode');
+    //         foreach ($uniqueResults as $res) {
+    //             $res->header = json_decode($res->header)[0];
+    //             $res->details = json_decode($res->details);
+    //         }
+    //         Cache::put('injuryList', $uniqueResults, 3600);
+
+    //         return $uniqueResults;
+    //     }
+    // }
+
     public function injuryList3(Request $r)
     {
         if ($r->hardRefresh == null) {
@@ -180,8 +234,7 @@ class InjuryServicesController extends Controller
             Cache::forget('injuryList3');
         }
         if (Cache::has('injuryList3')) {
-            $result = Cache::get('injuryList3');
-            return $result;
+            return Cache::get('injuryList3');
         } else {
             if (is_null($r->startdate) && is_null($r->enddate)) {
                 $startDate = now()->subDays(7)->format('m/d/Y');
@@ -202,25 +255,25 @@ class InjuryServicesController extends Controller
                 ->select('enccode', 'header', 'status', 'details', 'tStamp', 'admdate', 'injtme', 'primediag')
                 ->whereDate($datedescription, '>=', $startDate)
                 ->whereDate($datedescription, '<=', $endDate)
-                // ->where('primediag', '=', 'Y')
                 ->where('status', $r->status)
-                // ->where('primediag', '=', null, 'and', 'primediag', '=', 'Y')
                 ->where(function ($query) {
                     $query->where('primediag', '=', null)
                         ->orWhere('primediag', '=', 'Y');
                 })
                 ->orderByDesc($datedescription)
-                // ->distinct()
                 ->get();
-            // FacadesLog::info('inj list: ', [$result]);
-            $uniqueResults = $result->unique('enccode');
-            foreach ($uniqueResults as $res) {
+
+            $uniqueResults = $result->unique('enccode')->values(); // Ensure it's indexed correctly
+
+            $formattedResults = $uniqueResults->map(function ($res) {
                 $res->header = json_decode($res->header)[0];
                 $res->details = json_decode($res->details);
-            }
-            Cache::put('injuryList', $uniqueResults, 3600);
+                return $res;
+            })->toArray(); // Convert to array
 
-            return $uniqueResults;
+            Cache::put('injuryList3', $formattedResults, 3600); // Cache the array
+
+            return $formattedResults; // Return as array
         }
     }
 
@@ -249,8 +302,32 @@ class InjuryServicesController extends Controller
 
         return $uniqueResults;
     }
+    public function getABTCPhilhealthForm(Request $request)
+    {
+        $hpercode = $request->input('Hpercode');
 
+        // Call the stored procedure to get the data
+        $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?', [$hpercode]);
 
+        // Return the data as a JSON response
+        return response()->json($data);
+    }
+    public function generateABTCPdf(Request $request)
+    {
+        $hpercode = $request->input('Hpercode');
+
+        // Call the stored procedure to get the data
+        $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?', [$hpercode]);
+
+        // Check if data is returned
+        if (empty($data)) {
+            return response()->json(['error' => 'No data found'], 404);
+        }
+
+        // Prepare the view with the data
+        $pdf = PDF::loadView('abtc_form', ['formData' => $data[0]]); // Assuming the data is in the first index
+        return $pdf->stream('ABTC_Philhealth_Form.pdf'); // Stream the generated PDF
+    }
     // NEW TSS
     public function injuryList(Request $r)
     {
@@ -1505,7 +1582,7 @@ class InjuryServicesController extends Controller
             ->select('data', 'vaccineday', 'tStamp', 'primeTSS', 'prophylaxis')
             ->where('hpercode', '=', $r->hpercode)
             ->where('lockCase', '=', null)
-            ->where('prophylaxis', '=', $r->prophylaxis)
+            // ->where('prophylaxis', '=', $r->prophylaxis)
             ->get();
 
         $decodedData = [];
@@ -1579,12 +1656,10 @@ class InjuryServicesController extends Controller
     public function getPatientABTCLog(Request $r)
     {
         $response = DB::table('registry.dbo.opdDataJSON')
-            ->select('*')   
+            ->select('*')
             ->where('hpercode', '=', $r->hpercode)
-            ->where('lockCase','!=', null)
+            ->where('lockCase', '!=', null)
             ->get();
-
-
         return $response;
     }
 

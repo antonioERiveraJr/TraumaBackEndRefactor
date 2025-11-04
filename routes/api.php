@@ -97,6 +97,11 @@ Route::group(
         Route::get('/getEmployeeName', [App\Http\Controllers\InjuryServicesController::class, 'getEmployeeName']);
         Route::get('/getPatientReferral', [App\Http\Controllers\InjuryServicesController::class, 'getPatientReferral']);
 
+        // Route for fetching ABTC form data
+        Route::get('/getABTCPhilhealthForm', [InjuryServicesController::class, 'getABTCPhilhealthForm']);
+
+        // Route for generating the PDF
+        Route::post('/generate-pdf', [InjuryServicesController::class, 'generateABTCPdf']);
         Route::post('/reportList', [App\Http\Controllers\InjuryServicesController::class, 'reportList']);
         Route::post('/injuryList', [App\Http\Controllers\InjuryServicesController::class, 'injuryList']);
         Route::post('/injuryListDev', [App\Http\Controllers\InjuryServicesController::class, 'injuryListDev']);
