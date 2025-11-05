@@ -49,12 +49,12 @@
             display: flex;
             flex-direction: row;
             justify-content: space-between;
-            align-items: center; 
+            align-items: center;
             width: 100%;
             margin-bottom: 10px;
         }
 
-        .logo { 
+        .logo {
             height: 50px;
         }
 
@@ -62,17 +62,25 @@
         .header-title {
             flex: 1;
             text-align: center;
-            margin: 0;
+            margin-bottom: 3%;
         }
+
+
+
+
+        */
     </style>
 </head>
 
 <body>
-    <div class="header-container">
-        <img src="{{ asset('D:\xampp\htdocs\TraumaBackEnd\resources\images\BGHMC.b1dae07e.png') }}" class="logo">
+    <header>
+        {{-- <img src="{{ asset('images\BGHMC.b1dae07e.png') }}"> --}}
+        {{-- <img src="{{ public_path('images\BGHMC.b1dae07e.png') }}" alt="Image" /> --}}
         <h1 class="header-title">Animal Bite Treatment Record</h1>
-        <img src="{{ asset('D:\xampp\htdocs\TraumaBackEnd\resources\images\BGHMC.b1dae07e.png') }}" class="logo">
-    </div>
+        {{-- <img src="{{ asset('images\BGHMC.b1dae07e.png') }}"> --}}
+        {{-- <img src="{{ public_path('images\BGHMC.b1dae07e.png') }}" alt="Image" /> --}}
+
+    </header>
 
     <div class="section">
         <table class="table">
@@ -80,7 +88,7 @@
                 <th style="width: 17%;">DOH Certificate No.:</th>
                 <td style="width: 33%;">2019-CAR-0020</td>
                 <th style="width: 25%;">Transaction No:</th>
-                <td style="width: 25%;"></td>
+                <td style="width: 25%;">{{ $formData->hpercode }}</td>
             </tr>
             <tr>
                 <th>PhilHealth Accreditation No.:</th>
@@ -159,7 +167,7 @@
             <tr>
                 <td></td>
                 <th">handling/Ingestion of raw Infected Meat</th>
-                    <th>Past History of Animal Bite</th>
+                    <th>4. Past History of Animal Bite</th>
                     <td>{{ $formData->PastHistory }}</td>
             </tr>
         </table>
@@ -195,48 +203,88 @@
                     <table class="table" style="width: 100%">
                         <tr>
                             <th style="width: 20%">Day 0</th>
-                            <th style="width: 3%"></th>
+                            @if ($formData->firstDoseRoute === 'ID')
+                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
+                            @else 
+
+                                <th style="width: 3%"></th>
+                            @endif
                             <td style="width: 7%">ID</td>
-                            <th style="width: 3%"></th>
+                            @if ($formData->firstDoseRoute === 'IM')
+                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
+                            @else
+
+                                <th style="width: 3%"></th>
+                            @endif
                             <td style="width: 7%">IM</td>
-                            <td style="width:20%"></td>
-                            <td style="width:20%"></td>
+                            <td style="width:20%">{{ $formData->firstDoseDate }}</td>
+                            <td style="width:20%">{{ $formData->firstDoseBy }}</td>
                             <td style="width:20%"></td>
                         </tr>
                         <tr>
                             <th>Day 3</th>
-                            <td></td>
+                            @if ($formData->secondDoseRoute === 'ID')
+                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
+                            @else
+
+                                <th style="width: 3%"></th>
+                            @endif
                             <th>ID</th>
-                            <td></td>
+                            @if ($formData->secondDoseRoute === 'IM')
+                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
+                            @else
+
+                                <th style="width: 3%"></th>
+                            @endif
                             <th>IM</th>
-                            <td></td>
-                            <td></td>
+                            <td>{{ $formData->secondDoseDate }}</td>
+                            <td>{{ $formData->secondDoseBy }}</td>
                             <td></td>
                         </tr>
                         <tr>
                             <th>Day 7</th>
-                            <td></td>
+                            @if ($formData->thirdDoseRoute === 'ID')
+                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
+                            @else
+
+                                <th style="width: 3%"></th>
+                            @endif
                             <th>ID</th>
-                            <td></td>
+                            @if ($formData->thirdDoseRoute === 'IM')
+                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
+                            @else
+
+                                <th style="width: 3%"></th>
+                            @endif
                             <th>IM</th>
-                            <td></td>
-                            <td></td>
+                            <td>{{ $formData->thirdDoseDate }}</td>
+                            <td>{{ $formData->thirdDoseBy }}</td>
                             <td></td>
                         </tr>
                         <tr>
                             <th>Day 28</th>
-                            <td></td>
+                            @if ($formData->fourthDoseRoute === 'ID')
+                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
+                            @else
+
+                                <th style="width: 3%"></th>
+                            @endif
                             <th>ID</th>
-                            <td></td>
+                            @if ($formData->fourthDoseRoute === 'IM')
+                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
+                            @else
+
+                                <th style="width: 3%"></th>
+                            @endif
                             <th>IM</th>
-                            <td></td>
-                            <td></td>
+                            <td>{{ $formData->fourthDoseDate }}</td>
+                            <td>{{ $formData->fourthDoseBy }}</td>
                             <td></td>
                         </tr>
                     </table>
                     <table class="table" style="width: 100%">
                         <tr>
-                            <th style="width:40%">Erig</th>
+                            <th style="width:40%">ERIG {{ $formData->erig }} ml</th>
                             <td style="width:20%"></td>
                             <td style="width:20%"></td>
                             <td style="width:20%"></td>
@@ -254,14 +302,16 @@
                             <td></td>
                         </tr>
                 </td>
-                <td style="width: 18%; vertical-align: top; text-align: center; font-size: 2em; margin-top: 3em;">
-                    <table class="table" style="width: 100%;margin-top: .2em;">
+                <td style="width: 18%; vertical-align: top;   margin-top: 3em;"><br/><br/><br/>
+                    <table class="table" style="width: 100%;margin-top: .2em;font-size: 2em;">
                         <tr>
-                            <th style="text-align: center; width: 100%; font-weight: bold; font-size: 1.4em;">
-                                <br /><br />ICD CODE 10<br />90375<br /><br /><br />
+                            <th style="text-align: center;text-align: center; width: 100%; font-weight: bold; font-size: 1.4em;">
+                                ICD CODE 10<br />90375
                             </th>
                         </tr>
                     </table>
+                    <br/><br/><br/><br/><br/><br/><br/><br/>
+                    <h5>CERTIFIED TRUE COPY: </h5>
                 </td>
             </tr>
         </table>

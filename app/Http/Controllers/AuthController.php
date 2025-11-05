@@ -91,7 +91,7 @@ class AuthController extends Controller
         $token = $this->login($loginRequest);
         $array = $token->getData(true);
         $response = redirect("http://localhost:5173/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
-        // $response = redirect("http://192.168.6.58:61363/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
+        // $response = redirect("http://192.168.6.58:64877/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
         // $response = redirect("http://192.168.6.58:81/#/injury/PatientFromOPD?enccode={$r->enccode}&access_token={$array['data']['token']['plainTextToken']}&empID={$r->empID}");
 
         return $response;
