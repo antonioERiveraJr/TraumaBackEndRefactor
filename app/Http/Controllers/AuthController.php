@@ -97,6 +97,19 @@ class AuthController extends Controller
         return $response;
     }
 
+    public function loginABTCPhilhealth(Request $r){
+         $creds = $this->setCredsByEmpID($r->employeeid);
+        $loginRequest = new LoginUserRequest([
+            'username' => $creds->user_name,
+            'password' => $creds->user_pass
+        ]);
+        // dd($loginRequest);
+        $loginRequest['enccode'] = $r->enccode; 
+        $token = $this->login($loginRequest);
+        $array = $token->getData(true);
+        $response = redirect("http://localhost:5173/#/ABTCPhilhealthForm?hpercode={$r->hpercode}&access_token={$array['data']['token']['plainTextToken']}&employeeid={$r->employeeid}");
+       return $response;
+    }
     // public function setCredsByEmpID(request $r){
     public function setCredsByEmpID(string $empID)
     {

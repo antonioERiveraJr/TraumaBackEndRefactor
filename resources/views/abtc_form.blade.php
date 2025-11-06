@@ -44,7 +44,6 @@
             width: 150px;
         }
 
-        /* ✅ Header Layout Fix */
         .header-container {
             display: flex;
             flex-direction: row;
@@ -57,32 +56,18 @@
         .logo {
             height: 50px;
         }
-
-        /* Center title properly */
-        .header-title {
-            flex: 1;
-            text-align: center;
-            margin-bottom: 3%;
-        }
-
-
-
-
-        */
+ 
     </style>
 </head>
 
 <body>
-    <header>
-        {{-- <img src="{{ asset('images\BGHMC.b1dae07e.png') }}"> --}}
-        {{-- <img src="{{ public_path('images\BGHMC.b1dae07e.png') }}" alt="Image" /> --}}
-        <h1 class="header-title">Animal Bite Treatment Record</h1>
-        {{-- <img src="{{ asset('images\BGHMC.b1dae07e.png') }}"> --}}
-        {{-- <img src="{{ public_path('images\BGHMC.b1dae07e.png') }}" alt="Image" /> --}}
-
+    <header style="display: flex; align-items: center; justify-content: space-between;">
+        <img style="height: 60pt;" src="{{ asset('images/BGHMC.b1dae07e.png') }}" />
+        <h1 style="flex: 1; text-align: center;">Animal Bite Treatment Record</h1>
+        <img style="height: 60pt;" src="{{ asset('images/DOH.7c917786.png') }}" />
     </header>
 
-    <div class="section">
+    <div>
         <table class="table">
             <tr>
                 <th style="width: 17%;">DOH Certificate No.:</th>
@@ -122,14 +107,15 @@
                 <td>{{ $formData->weight }} kg</td>
             </tr>
             <tr>
-                <th">Exposure Category</th>
-                    <td>{{ $formData->BiteCategory }}</td>
-                    <th">Date of Exposure:</th>
-                        <td>{{ $formData->DateOfExposure }}</td>
-                        <th">Treatment Started:</th>
-                            <td>{{ $formData->TreatmentStartedDate }}</td>
+                <th>Exposure Category</th>
+                <td>{{ $formData->BiteCategory }}</td>
+                <th>Date of Exposure:</th>
+                <td>{{ $formData->DateOfExposure }}</td>
+                <th>Treatment Started:</th>
+                <td>{{ $formData->TreatmentStartedDate }}</td>
             </tr>
         </table>
+
         <table class="table">
             <tr>
                 <th style="width: 50%">1. Mode of Animal Exposure:</th>
@@ -151,37 +137,34 @@
             </tr>
             <tr>
                 <td style="width: 3%"></td>
-                <th style="width: 47%">Scatch/Abrasion</th>
+                <th style="width: 47%">Scratch/Abrasion</th>
                 <td style="width: 3%"></td>
                 <th style="width: 47%">NA (If by Ingestion Mode)</th>
             </tr>
-
         </table>
         <table class="table">
             <tr>
                 <td style="width: 3%"></td>
-                <th style="width: 47%">Transderma Bite</th>
+                <th style="width: 47%">Transdermal Bite</th>
                 <th style="width: 20%">3. Type of Animal: </th>
                 <td style="width: 30%">{{ $formData->TypeOfAnimal }}</td>
             </tr>
             <tr>
                 <td></td>
-                <th">handling/Ingestion of raw Infected Meat</th>
-                    <th>4. Past History of Animal Bite</th>
-                    <td>{{ $formData->PastHistory }}</td>
+                <th>Handling/Ingestion of Raw Infected Meat</th>
+                <th>4. Past History of Animal Bite</th>
+                <td>{{ $formData->PastHistory }}</td>
             </tr>
         </table>
         <table class="table">
             <tr>
-
                 <td style="width: 3%"></td>
                 <th style="width: 97%">Any Combination of the Above</th>
             </tr>
         </table>
         <table class="table">
             <tr>
-                <th style="width: 50%"> 5. Based on item No. 4 was the PEP Primary Immunization Schedule Completed:
-                </th>
+                <th style="width: 50%">5. Based on item No. 4 was the PEP Primary Immunization Schedule Completed:</th>
                 <th style="width: 50%"></th>
             </tr>
         </table>
@@ -203,19 +186,13 @@
                     <table class="table" style="width: 100%">
                         <tr>
                             <th style="width: 20%">Day 0</th>
-                            @if ($formData->firstDoseRoute === 'ID')
-                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
-                            @else 
-
-                                <th style="width: 3%"></th>
-                            @endif
+                            <td style="width: 3%">
+                                {!! $formData->firstDoseRoute === 'ID' ? '✓' : '□' !!}
+                            </td>
                             <td style="width: 7%">ID</td>
-                            @if ($formData->firstDoseRoute === 'IM')
-                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
-                            @else
-
-                                <th style="width: 3%"></th>
-                            @endif
+                            <td style="width: 3%">
+                                {!! $formData->firstDoseRoute === 'IM' ? '✓' : '□' !!}
+                            </td>
                             <td style="width: 7%">IM</td>
                             <td style="width:20%">{{ $formData->firstDoseDate }}</td>
                             <td style="width:20%">{{ $formData->firstDoseBy }}</td>
@@ -223,60 +200,42 @@
                         </tr>
                         <tr>
                             <th>Day 3</th>
-                            @if ($formData->secondDoseRoute === 'ID')
-                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
-                            @else
-
-                                <th style="width: 3%"></th>
-                            @endif
-                            <th>ID</th>
-                            @if ($formData->secondDoseRoute === 'IM')
-                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
-                            @else
-
-                                <th style="width: 3%"></th>
-                            @endif
-                            <th>IM</th>
+                            <td style="width: 3%">
+                                {!! $formData->secondDoseRoute === 'ID' ? '✓' : '□' !!}
+                            </td>
+                            <td>ID</td>
+                            <td style="width: 3%">
+                                {!! $formData->secondDoseRoute === 'IM' ? '✓' : '□' !!}
+                            </td>
+                            <td>IM</td>
                             <td>{{ $formData->secondDoseDate }}</td>
                             <td>{{ $formData->secondDoseBy }}</td>
                             <td></td>
                         </tr>
                         <tr>
                             <th>Day 7</th>
-                            @if ($formData->thirdDoseRoute === 'ID')
-                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
-                            @else
-
-                                <th style="width: 3%"></th>
-                            @endif
-                            <th>ID</th>
-                            @if ($formData->thirdDoseRoute === 'IM')
-                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
-                            @else
-
-                                <th style="width: 3%"></th>
-                            @endif
-                            <th>IM</th>
+                            <td style="width: 3%">
+                                {!! $formData->thirdDoseRoute === 'ID' ? '✓' : '□' !!}
+                            </td>
+                            <td>ID</td>
+                            <td style="width: 3%">
+                                {!! $formData->thirdDoseRoute === 'IM' ? '✓' : '□' !!}
+                            </td>
+                            <td>IM</td>
                             <td>{{ $formData->thirdDoseDate }}</td>
                             <td>{{ $formData->thirdDoseBy }}</td>
                             <td></td>
                         </tr>
                         <tr>
                             <th>Day 28</th>
-                            @if ($formData->fourthDoseRoute === 'ID')
-                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
-                            @else
-
-                                <th style="width: 3%"></th>
-                            @endif
-                            <th>ID</th>
-                            @if ($formData->fourthDoseRoute === 'IM')
-                                <input type="checkbox" checked style="width: 3%;margin-left:3pt; font-size: large;">
-                            @else
-
-                                <th style="width: 3%"></th>
-                            @endif
-                            <th>IM</th>
+                            <td style="width: 3%">
+                                {!! $formData->fourthDoseRoute === 'ID' ? '✓' : '□' !!}
+                            </td>
+                            <td>ID</td>
+                            <td style="width: 3%">
+                                {!! $formData->fourthDoseRoute === 'IM' ? '✓' : '□' !!}
+                            </td>
+                            <td>IM</td>
                             <td>{{ $formData->fourthDoseDate }}</td>
                             <td>{{ $formData->fourthDoseBy }}</td>
                             <td></td>
@@ -301,26 +260,21 @@
                             <td></td>
                             <td></td>
                         </tr>
+                    </table>
                 </td>
-                <td style="width: 18%; vertical-align: top;   margin-top: 3em;"><br/><br/><br/>
+                <td style="width: 18%; vertical-align: top; margin-top: 3em;">
                     <table class="table" style="width: 100%;margin-top: .2em;font-size: 2em;">
                         <tr>
-                            <th style="text-align: center;text-align: center; width: 100%; font-weight: bold; font-size: 1.4em;">
+                            <th style="text-align: center; width: 100%; font-weight: bold; font-size: 1.4em;">
                                 ICD CODE 10<br />90375
                             </th>
                         </tr>
                     </table>
-                    <br/><br/><br/><br/><br/><br/><br/><br/>
-                    <h5>CERTIFIED TRUE COPY: </h5>
+                    <h5>CERTIFIED TRUE COPY:</h5>
                 </td>
             </tr>
         </table>
     </div>
-
-
-
-
-
 </body>
 
 </html>

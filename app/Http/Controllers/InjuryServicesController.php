@@ -30,6 +30,10 @@ use Illuminate\Support\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\InjuryExport;
 use PDF; // Import the PDF facade
+use Dompdf\Dompdf;
+use Dompdf\Options;
+// use Dompdf\Dompdf;
+// use Dompdf\Options; 
 // use Illuminate\Container\Attributes\Log;
 
 class InjuryServicesController extends Controller
@@ -312,6 +316,52 @@ class InjuryServicesController extends Controller
         // Return the data as a JSON response
         return response()->json($data);
     }
+
+public function generatePreviewPDF(Request $request)
+{
+    $htmlContent = $request->input('html');
+    
+    // Set up Dompdf options
+    $options = new Options();
+    $options->set('defaultFont', 'Arial');
+    
+    $dompdf = new Dompdf($options);
+    $dompdf->loadHtml($htmlContent);
+    
+    // Set paper size and orientation
+    $dompdf->setPaper('A4', 'landscape');
+    
+    // Render the PDF
+    $dompdf->render();
+    
+    return response()->stream(
+        function () use ($dompdf) {
+            echo $dompdf->output();
+        },
+        200,
+        [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="Preview_ABTC_Philhealth_Form.pdf"',
+        ]
+    );
+} 
+    public function previewPDF(Request $request)
+{
+    // If you need to fetch the data for preview
+    $hpercode = $request->input('hpercode'); // Ensure this is passed in the request
+
+    // Call the stored procedure to get the data
+    $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?', [$hpercode]);
+    // Check if data is returned
+    if (empty($data)) {
+        return response()->json(['error' => 'No data found'], 404);
+    }
+    
+
+    // Prepare the view with the data
+    return view('abtc_form', ['formData' => $data[0]]);
+}
+
     public function generateABTCPdf(Request $request)
     {
         $hpercode = $request->input('Hpercode');
@@ -325,9 +375,52 @@ class InjuryServicesController extends Controller
         }
 
         // Prepare the view with the data
-        $pdf = PDF::loadView('abtc_form', ['formData' => $data[0]]); // Assuming the data is in the first index
-        return $pdf->stream('ABTC_Philhealth_Form.pdf'); // Stream the generated PDF
+        $pdf = Pdf::loadView('abtc_form', ['formData' => $data[0]]); 
+        // dd($pdf)
+        return $pdf->stream('ABTC_Philhealth_Form.pdf'); 
     }
+
+    // public function generatePDF(Request $request)
+    // {
+    //     $hpercode = $request->input('Hpercode');
+
+    //     // Fetch your data here
+    //     $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?', [$hpercode]);
+
+    //     if (empty($data)) {
+    //         return response()->json(['error' => 'No data found'], 404);
+    //     }
+
+    //     // Load the view and pass the data
+    //     $html = view('abtc_form', ['formData' => $data[0]])->render();
+
+    //     // Set up Dompdf options
+    //     $options = new Options();
+    //     $options->set('defaultFont', 'Arial');
+    //     $options->set('isHtml5ParserEnabled', true);
+    //     $options->set('isRemoteEnabled', true);
+        
+    //     $dompdf = new Dompdf($options);
+    //     $dompdf->loadHtml($html);
+
+    //     // Set paper size and orientation
+    //     $dompdf->setPaper('A4', 'landscape');
+
+    //     // Render the PDF
+    //     $dompdf->render();
+
+    //     // Output the generated PDF to Browser
+    //     return response()->stream(
+    //         function () use ($dompdf) {
+    //             echo $dompdf->output();
+    //         },
+    //         200,
+    //         [
+    //             'Content-Type' => 'application/pdf',
+    //             'Content-Disposition' => 'attachment; filename="ABTC_Philhealth_Form.pdf"',
+    //         ]
+    //     );
+    // }
     // NEW TSS
     public function injuryList(Request $r)
     {

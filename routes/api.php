@@ -23,13 +23,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::post('/previewPDF', [InjuryServicesController::class, 'previewPDF']); 
+Route::post('/generatePreviewPDF', [InjuryServicesController::class, 'generatePreviewPDF']); 
 
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
 // Route::post('/loginbyid', [AuthController::class, 'loginByID']);
 Route::get('/fromEMR', [AuthController::class, 'loginById']);
 Route::get('/fromOPD', [AuthController::class, 'loginOPD']);
-Route::get('/opdPatientData', [App\Http\Controllers\InjuryServicesController::class, 'opdPatientData']);
+Route::get('/loginABTCPhilhealth', [AuthController::class, 'loginABTCPhilhealth']);
+Route::get('/opdPatientData', [AuthController::class, 'opdPatientData']);
 // Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/test-cookie', function () {
