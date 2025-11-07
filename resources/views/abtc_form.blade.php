@@ -26,6 +26,34 @@
             border-collapse: collapse;
         }
 
+        .head { 
+            width: 100%;
+            text-align: center; 
+            padding: 1px;  
+            height: 10%; 
+        }
+
+        .imgl{
+            height: 80px; 
+            margin-right:20%; 
+            display: inline-block; 
+            width: 80px;
+            vertical-align: middle; 
+        }
+         .imgr {
+            height: 80px; 
+            margin-left: 20%; 
+            display: inline-block; 
+            width: 80px;
+            vertical-align: middle; 
+        }
+
+        .head h1 {
+            width: 35%;
+            display: inline-block; 
+            margin: 0; 
+        }
+
         .table th,
         .table td {
             border: 1px solid #000;
@@ -37,14 +65,23 @@
             background-color: #f2f2f2;
             font-weight: bold;
         }
+
+        /* .upn {
+          background-image:url("{{ asset('D:\xampp\htdocs\TraumaBackEnd\public\images\BGHMC.b1dae07e.png') }}");
+          background-repeat:no-repeat;
+          width:700px;
+          height:342px;
+          position:absolute;
+       } */
     </style>
 </head>
 
 <body>
-    <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5%;"></header>
-        <h1 style="flex: 1; text-align: center;">Animal Bite Treatment Record</h1>
+    <header class="head">
+        <img class="imgl" src="{{ public_path('images/BGHMC.b1dae07e.png') }}" />
+        <h1>Animal Bite Treatment Record</h1>
+        <img class="imgr" src="{{ public_path('images/BGHMC.b1dae07e.png') }}" />
     </header>
-
     <div>
         {{--
         <pre>{{ print_r($formFields, true) }}</pre>
@@ -77,12 +114,12 @@
 
         <table class="table">
             <tr>
-                <th>Patient Name:</th>
-                <td>{{ $formData->PatientName }}</td>
-                <th>Age:</th>
-                <td>{{ $formData->Age }}</td>
-                <th>Date of Birth:</th>
-                <td>{{ $formData->DateOfBirth }}</td>
+                <th style="width: 17%;">Patient Name:</th>
+                <td style="width: 33%;">{{ $formData->PatientName }}</td>
+                <th style="width: 12.5%;">Age:</th>
+                <td style="width: 12.5%;">{{ $formData->Age }}</td>
+                <th style="width: 12.5%;">Date of Birth:</th>
+                <td style="width: 12.5%;">{{ $formData->DateOfBirth }}</td>
             </tr>
             <tr>
                 <th>Address:</th>
@@ -119,15 +156,15 @@
             </tr>
             <tr>
                 <td style="width: 3%"><input type="checkbox" {{ $formFields->woundedSkin === 'Y' ? 'checked' : '' }}></td>
-                <th style="width: 47%">Nibbling/Licking of Wounded/Broken Skin</th> 
+                <th style="width: 47%">Nibbling/Licking of Wounded/Broken Skin</th>
                 <td style="width: 3%"><input type="checkbox" {{ $formFields->exposedBody === 'Other Parts of the Body' ? 'checked' : '' }}></td>
                 <th style="width: 47%">Other Parts of the Body</th>
             </tr>
             <tr>
                 <td style="width: 3%"><input type="checkbox" {{ $formFields->abrasion === 'Y' ? 'checked' : '' }}></td>
                 <th style="width: 47%">Scratch/Abrasion</th>
-                    <td style="width: 3%"><input type="checkbox" {{ $formFields->exposedBody === 'NA (if by Ingestion Mode)' ? 'checked' : '' }}></td>
-                    <th style="width: 47%">NA (If by Ingestion Mode)</th>
+                <td style="width: 3%"><input type="checkbox" {{ $formFields->exposedBody === 'NA (if by Ingestion Mode)' ? 'checked' : '' }}></td>
+                <th style="width: 47%">NA (If by Ingestion Mode)</th>
             </tr>
         </table>
         <table class="table">
