@@ -37,37 +37,18 @@
             background-color: #f2f2f2;
             font-weight: bold;
         }
-
-        .line {
-            display: inline-block;
-            border-bottom: 1px solid #000;
-            width: 150px;
-        }
-
-        .header-container {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
-        .logo {
-            height: 50px;
-        }
- 
     </style>
 </head>
 
 <body>
-    <header style="display: flex; align-items: center; justify-content: space-between;">
-        <img style="height: 60pt;" src="{{ asset('images/BGHMC.b1dae07e.png') }}" />
+    <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5%;"></header>
         <h1 style="flex: 1; text-align: center;">Animal Bite Treatment Record</h1>
-        <img style="height: 60pt;" src="{{ asset('images/DOH.7c917786.png') }}" />
     </header>
 
     <div>
+        {{--
+        <pre>{{ print_r($formFields, true) }}</pre>
+        <pre>{{ print_r($formData, true) }}</pre> --}}
         <table class="table">
             <tr>
                 <th style="width: 17%;">DOH Certificate No.:</th>
@@ -81,22 +62,27 @@
                 <th>Date:</th>
                 <td>{{ date('m-d-Y') }}</td>
             </tr>
+
+        </table>
+        <table class="table">
             <tr>
-                <th>PhilHealth Identification Number (PIN):</th>
-                <td></td>
-                <th>[ ] Member</th>
-                <th>[ ] Dependent</th>
+                <th style="width: 17%;">PhilHealth Identification Number (PIN):</th>
+                <td style="width: 33%;"></td>
+                <th style="width: 2%;"><input type="checkbox" {{ $formFields->membershipStatus === 'Member' ? 'checked' : '' }}></th>
+                <td style="width: 23%;">Member</td>
+                <th style="width: 2%;"><input type="checkbox" {{ $formFields->membershipStatus === 'Dependent' ? 'checked' : '' }}></th>
+                <td style="width: 23%;">Dependent</td>
             </tr>
         </table>
 
         <table class="table">
             <tr>
-                <th style="width: 17%;">Patient Name:</th>
-                <td style="width: 33%;">{{ $formData->PatientName }}</td>
-                <th style="width: 10%;">Age:</th>
-                <td style="width: 15%;">{{ $formData->Age }}</td>
-                <th style="width: 10%;">Date of Birth:</th>
-                <td style="width: 15%;">{{ $formData->DateOfBirth }}</td>
+                <th>Patient Name:</th>
+                <td>{{ $formData->PatientName }}</td>
+                <th>Age:</th>
+                <td>{{ $formData->Age }}</td>
+                <th>Date of Birth:</th>
+                <td>{{ $formData->DateOfBirth }}</td>
             </tr>
             <tr>
                 <th>Address:</th>
@@ -124,48 +110,52 @@
         </table>
         <table class="table">
             <tr>
-                <td style="width: 3%"></td>
+                <td style="width: 3%">
+                    <input type="checkbox" {{ $formFields->unCoveredSkin === 'Y' ? 'checked' : '' }}>
+                </td>
                 <th style="width: 47%">Nibbling/Licking of Uncovered Skin</th>
-                <td style="width: 3%"></td>
+                <td style="width: 3%"><input type="checkbox" {{ $formFields->exposedBody === 'Head and/or Neck' ? 'checked' : '' }}></td>
                 <th style="width: 47%">Head and/or Neck</th>
             </tr>
             <tr>
-                <td style="width: 3%"></td>
-                <th style="width: 47%">Nibbling/Licking of Wounded/Broken Skin</th>
-                <td style="width: 3%"></td>
+                <td style="width: 3%"><input type="checkbox" {{ $formFields->woundedSkin === 'Y' ? 'checked' : '' }}></td>
+                <th style="width: 47%">Nibbling/Licking of Wounded/Broken Skin</th> 
+                <td style="width: 3%"><input type="checkbox" {{ $formFields->exposedBody === 'Other Parts of the Body' ? 'checked' : '' }}></td>
                 <th style="width: 47%">Other Parts of the Body</th>
             </tr>
             <tr>
-                <td style="width: 3%"></td>
+                <td style="width: 3%"><input type="checkbox" {{ $formFields->abrasion === 'Y' ? 'checked' : '' }}></td>
                 <th style="width: 47%">Scratch/Abrasion</th>
-                <td style="width: 3%"></td>
-                <th style="width: 47%">NA (If by Ingestion Mode)</th>
+                    <td style="width: 3%"><input type="checkbox" {{ $formFields->exposedBody === 'NA (if by Ingestion Mode)' ? 'checked' : '' }}></td>
+                    <th style="width: 47%">NA (If by Ingestion Mode)</th>
             </tr>
         </table>
         <table class="table">
             <tr>
-                <td style="width: 3%"></td>
+                <td style="width: 3%"><input type="checkbox" {{ $formFields->transdermalBite === 'Y' ? 'checked' : '' }}>
+                </td>
                 <th style="width: 47%">Transdermal Bite</th>
                 <th style="width: 20%">3. Type of Animal: </th>
                 <td style="width: 30%">{{ $formData->TypeOfAnimal }}</td>
             </tr>
             <tr>
-                <td></td>
+                <td><input type="checkbox" {{ $formFields->handlingIngestion === 'Y' ? 'checked' : '' }}></td>
                 <th>Handling/Ingestion of Raw Infected Meat</th>
                 <th>4. Past History of Animal Bite</th>
-                <td>{{ $formData->PastHistory }}</td>
+                <td>{{ $formFields->biteHistory }}</td>
             </tr>
         </table>
         <table class="table">
             <tr>
-                <td style="width: 3%"></td>
+                <td style="width: 3%"><input type="checkbox" {{ $formFields->anyCombination === 'Y' ? 'checked' : '' }}>
+                </td>
                 <th style="width: 97%">Any Combination of the Above</th>
             </tr>
         </table>
         <table class="table">
             <tr>
                 <th style="width: 50%">5. Based on item No. 4 was the PEP Primary Immunization Schedule Completed:</th>
-                <th style="width: 50%"></th>
+                <th style="width: 50%">{{ $formFields->completeImmunization }}</th>
             </tr>
         </table>
         <table style="width: 100%; border-collapse: collapse;">
@@ -187,11 +177,11 @@
                         <tr>
                             <th style="width: 20%">Day 0</th>
                             <td style="width: 3%">
-                                {!! $formData->firstDoseRoute === 'ID' ? '✓' : '□' !!}
+                                <input type="checkbox" {{ $formData->firstDoseRoute === 'ID' ? 'checked' : '' }}>
                             </td>
                             <td style="width: 7%">ID</td>
                             <td style="width: 3%">
-                                {!! $formData->firstDoseRoute === 'IM' ? '✓' : '□' !!}
+                                <input type="checkbox" {{ $formData->firstDoseRoute === 'IM' ? 'checked' : '' }}>
                             </td>
                             <td style="width: 7%">IM</td>
                             <td style="width:20%">{{ $formData->firstDoseDate }}</td>
@@ -201,11 +191,11 @@
                         <tr>
                             <th>Day 3</th>
                             <td style="width: 3%">
-                                {!! $formData->secondDoseRoute === 'ID' ? '✓' : '□' !!}
+                                <input type="checkbox" {{ $formData->secondDoseRoute === 'ID' ? 'checked' : '' }}>
                             </td>
                             <td>ID</td>
                             <td style="width: 3%">
-                                {!! $formData->secondDoseRoute === 'IM' ? '✓' : '□' !!}
+                                <input type="checkbox" {{ $formData->secondDoseRoute === 'IM' ? 'checked' : '' }}>
                             </td>
                             <td>IM</td>
                             <td>{{ $formData->secondDoseDate }}</td>
@@ -215,11 +205,11 @@
                         <tr>
                             <th>Day 7</th>
                             <td style="width: 3%">
-                                {!! $formData->thirdDoseRoute === 'ID' ? '✓' : '□' !!}
+                                <input type="checkbox" {{ $formData->thirdDoseRoute === 'ID' ? 'checked' : '' }}>
                             </td>
                             <td>ID</td>
                             <td style="width: 3%">
-                                {!! $formData->thirdDoseRoute === 'IM' ? '✓' : '□' !!}
+                                <input type="checkbox" {{ $formData->thirdDoseRoute === 'IM' ? 'checked' : '' }}>
                             </td>
                             <td>IM</td>
                             <td>{{ $formData->thirdDoseDate }}</td>
@@ -229,11 +219,11 @@
                         <tr>
                             <th>Day 28</th>
                             <td style="width: 3%">
-                                {!! $formData->fourthDoseRoute === 'ID' ? '✓' : '□' !!}
+                                <input type="checkbox" {{ $formData->fourthDoseRoute === 'ID' ? 'checked' : '' }}>
                             </td>
                             <td>ID</td>
                             <td style="width: 3%">
-                                {!! $formData->fourthDoseRoute === 'IM' ? '✓' : '□' !!}
+                                <input type="checkbox" {{ $formData->fourthDoseRoute === 'IM' ? 'checked' : '' }}>
                             </td>
                             <td>IM</td>
                             <td>{{ $formData->fourthDoseDate }}</td>

@@ -316,69 +316,50 @@ class InjuryServicesController extends Controller
         // Return the data as a JSON response
         return response()->json($data);
     }
-
-public function generatePreviewPDF(Request $request)
-{
-    $htmlContent = $request->input('html');
-    
-    // Set up Dompdf options
-    $options = new Options();
-    $options->set('defaultFont', 'Arial');
-    
-    $dompdf = new Dompdf($options);
-    $dompdf->loadHtml($htmlContent);
-    
-    // Set paper size and orientation
-    $dompdf->setPaper('A4', 'landscape');
-    
-    // Render the PDF
-    $dompdf->render();
-    
-    return response()->stream(
-        function () use ($dompdf) {
-            echo $dompdf->output();
-        },
-        200,
-        [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="Preview_ABTC_Philhealth_Form.pdf"',
-        ]
-    );
-} 
+ 
     public function previewPDF(Request $request)
-{
-    // If you need to fetch the data for preview
-    $hpercode = $request->input('hpercode'); // Ensure this is passed in the request
-
-    // Call the stored procedure to get the data
-    $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?', [$hpercode]);
-    // Check if data is returned
-    if (empty($data)) {
-        return response()->json(['error' => 'No data found'], 404);
-    }
-    
-
-    // Prepare the view with the data
-    return view('abtc_form', ['formData' => $data[0]]);
-}
-
-    public function generateABTCPdf(Request $request)
     {
-        $hpercode = $request->input('Hpercode');
+        // If you need to fetch the data for preview
+        $hpercode = $request->input('hpercode'); // Ensure this is passed in the request
 
         // Call the stored procedure to get the data
         $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?', [$hpercode]);
-
         // Check if data is returned
         if (empty($data)) {
             return response()->json(['error' => 'No data found'], 404);
         }
 
+        $formFields = (object) $request->formFields;
+
         // Prepare the view with the data
-        $pdf = Pdf::loadView('abtc_form', ['formData' => $data[0]]); 
-        // dd($pdf)
-        return $pdf->stream('ABTC_Philhealth_Form.pdf'); 
+        return view('abtc_form', ['formData' => $data[0], 'formFields' => $formFields]);
     }
+
+   public function generateABTCPdf(Request $request)
+{
+    $hpercode = $request->input('Hpercode');
+
+    $formFields = (object) $request->formFields;
+    // Call the stored procedure to get the data
+    $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?', [$hpercode]);
+
+    // Check if data is returned
+    if (empty($data)) {
+        return response()->json(['error' => 'No data found'], 404);
+    }
+
+    // Convert formFields array to an object 
+
+    // Prepare the view with the data
+    $pdf = Pdf::loadView('abtc_form', ['formData' => $data[0], 'formFields' => $formFields]);
+
+    FacadesLog::info('Form Data:', [
+        'data' => $data[0],
+        'formField' => $formFields
+    ]);
+
+    return $pdf->stream('ABTC_Philhealth_Form.pdf');
+}
 
     // public function generatePDF(Request $request)
     // {
@@ -399,7 +380,7 @@ public function generatePreviewPDF(Request $request)
     //     $options->set('defaultFont', 'Arial');
     //     $options->set('isHtml5ParserEnabled', true);
     //     $options->set('isRemoteEnabled', true);
-        
+
     //     $dompdf = new Dompdf($options);
     //     $dompdf->loadHtml($html);
 
