@@ -31,7 +31,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/fromEMR', [AuthController::class, 'loginById']);
 Route::get('/fromOPD', [AuthController::class, 'loginOPD']);
 Route::get('/loginABTCPhilhealth', [AuthController::class, 'loginABTCPhilhealth']);
-Route::get('/opdPatientData', [AuthController::class, 'opdPatientData']);
+Route::get('/opdPatientData', [InjuryServicesController::class, 'opdPatientData']);
 // Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/test-cookie', function () {

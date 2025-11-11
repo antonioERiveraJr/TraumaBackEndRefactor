@@ -80,7 +80,7 @@
     <header class="head">
         <img class="imgl" src="{{ public_path('images/BGHMC.b1dae07e.png') }}" />
         <h1>Animal Bite Treatment Record</h1>
-        <img class="imgr" src="{{ public_path('images/BGHMC.b1dae07e.png') }}" />
+        <img class="imgr" src="{{ public_path('images/DOH.7c917786.png') }}" />
     </header>
     <div>
         {{--
