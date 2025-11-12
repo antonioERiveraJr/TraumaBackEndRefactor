@@ -316,7 +316,7 @@ class InjuryServicesController extends Controller
         // Return the data as a JSON response
         return response()->json($data);
     }
- 
+
     public function previewPDF(Request $request)
     {
         // If you need to fetch the data for preview
@@ -335,31 +335,31 @@ class InjuryServicesController extends Controller
         return view('abtc_form', ['formData' => $data[0], 'formFields' => $formFields]);
     }
 
-   public function generateABTCPdf(Request $request)
-{
-    $hpercode = $request->input('Hpercode');
+    public function generateABTCPdf(Request $request)
+    {
+        $hpercode = $request->input('Hpercode');
 
-    $formFields = (object) $request->formFields;
-    // Call the stored procedure to get the data
-    $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?', [$hpercode]);
+        $formFields = (object) $request->formFields;
+        // Call the stored procedure to get the data
+        $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?', [$hpercode]);
 
-    // Check if data is returned
-    if (empty($data)) {
-        return response()->json(['error' => 'No data found'], 404);
+        // Check if data is returned
+        if (empty($data)) {
+            return response()->json(['error' => 'No data found'], 404);
+        }
+
+        // Convert formFields array to an object 
+
+        // Prepare the view with the data
+        $pdf = Pdf::loadView('abtc_form', ['formData' => $data[0], 'formFields' => $formFields]);
+
+        FacadesLog::info('Form Data:', [
+            'data' => $data[0],
+            'formField' => $formFields
+        ]);
+
+        return $pdf->stream('ABTC_Philhealth_Form.pdf');
     }
-
-    // Convert formFields array to an object 
-
-    // Prepare the view with the data
-    $pdf = Pdf::loadView('abtc_form', ['formData' => $data[0], 'formFields' => $formFields]);
-
-    FacadesLog::info('Form Data:', [
-        'data' => $data[0],
-        'formField' => $formFields
-    ]);
-
-    return $pdf->stream('ABTC_Philhealth_Form.pdf');
-}
 
     // public function generatePDF(Request $request)
     // {
@@ -1308,6 +1308,73 @@ class InjuryServicesController extends Controller
             return $this->error($e->getMessage(), 'Error', 500);
         }
     }
+    public function insertPlan(Request $r)
+    {
+        try {
+            // update when latest form and same ID
+            if ($r->isUpdateForm) {
+                $result = DB::table('hospital.dbo.ufive_cli_plan')
+                    ->where('id', $r->ufiveID)
+                    ->where('enccode', $r->enccode)
+                    ->update([
+                        'pplan' => $r->plan,
+                        'entry_by' => $r->entryby,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+            } else {
+                $result = DB::table('hospital.dbo.ufive_cli_plan')->insertGetId([
+                    'enccode' => $r->enccode,
+                    'pplan' => $r->plan,
+                    'hpercode' => $r->hpercode,
+                    'entry_by' => $r->entryby,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                    'order_at' => now()
+                ]);
+            }
+
+            if ($result) {
+                return $this->success(['id' => $result], 'Success', 200);
+            }
+        } catch (Exception $e) {
+            FacadesLog::info('error insert obj subj: ' . json_encode(['error' => $this->error($e->getMessage(), 'Error', 500)]));
+            return $this->error($e->getMessage(), 'Error', 500);
+        }
+    }
+    public function insertChiefComplaint(Request $r)
+    {
+        try {
+            // update when latest form and same ID
+            if ($r->isUpdateForm) {
+                $result = DB::table('hospital.les.cf4ChiefComplaint')
+                    ->where('id', $r->ufiveID)
+                    ->where('enccode', $r->enccode)
+                    ->update([
+                        'chief_complaint' => $r->plan,
+                        'entry_by' => $r->entryby,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+            } else {
+                $result = DB::table('hospital.les.cf4ChiefComplaint')->insertGetId([
+                    'enccode' => $r->enccode,
+                    'chief_complaint' => $r->plan,
+                    'hpercode' => $r->hpercode,
+                    'entry_by' => $r->entryby,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+
+            if ($result) {
+                return $this->success(['id' => $result], 'Success', 200);
+            }
+        } catch (Exception $e) {
+            FacadesLog::info('error insert obj subj: ' . json_encode(['error' => $this->error($e->getMessage(), 'Error', 500)]));
+            return $this->error($e->getMessage(), 'Error', 500);
+        }
+    }
 
     // public function insertObjSubj(Request $r)
     // {
@@ -1553,6 +1620,29 @@ class InjuryServicesController extends Controller
             return $this->error($e->getMessage(), 'Error', 500);
         }
     }
+    public function isOPDABTCFormUpdatable(Request $r)
+    {
+        try {
+            // Get the latest entry by hpercode
+            $latestEntry = DB::table('registry.dbo.opdDataJSON')
+                ->select('enccode', 'hpercode', 'entryby', 'tStamp')
+                ->where('hpercode', $r->hpercode)
+                ->where('tStamp', '>=', now()->subHours(1118))
+                ->orderByDesc('tStamp')
+                ->first();
+
+            // Check if the latest entry exists and if the enccode matches
+            // if ($latestEntry && $latestEntry->enccode === $r->enccode) {
+            //     return response()->json($latestEntry);
+            if ($latestEntry && strtolower($latestEntry->enccode) === strtolower($r->enccode)) {
+                return response()->json($latestEntry);
+            } else {
+                return $this->error($r->enccode, 'No valid record found', 404);
+            }
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 'Error', 500);
+        }
+    }
 
     //  public function getLatestDiagnosis(Request $r)
     // {
@@ -1657,6 +1747,10 @@ class InjuryServicesController extends Controller
             ->where('hpercode', '=', $r->hpercode)
             ->where('lockCase', '=', null)
             // ->where('prophylaxis', '=', $r->prophylaxis)
+            // ->orderBy('tStamp')
+
+            ->orderByDesc('tStamp')
+            ->distinct()
             ->get();
 
         $decodedData = [];

@@ -122,6 +122,7 @@ Route::group(
         Route::post('/saveOPDData', [App\Http\Controllers\InjuryServicesController::class, 'saveOPDData']);
         Route::get('/getPatientABTCLog', [App\Http\Controllers\InjuryServicesController::class, 'getPatientABTCLog']);
         Route::get('/getLatestEntryOfDoctors', [App\Http\Controllers\InjuryServicesController::class, 'getLatestEntryOfDoctors']);
+        Route::get('/isOPDABTCFormUpdatable', [App\Http\Controllers\InjuryServicesController::class, 'isOPDABTCFormUpdatable']);
         // Route::get('/getLatestDiagnosis', [App\Http\Controllers\InjuryServicesController::class, 'getLatestDiagnosis']);
         Route::get('/getEntryOfDoctors', [App\Http\Controllers\InjuryServicesController::class, 'getEntryOfDoctors']);
         Route::get('/getFormDetail', [App\Http\Controllers\InjuryServicesController::class, 'getFormDetail']);
@@ -129,6 +130,8 @@ Route::group(
         Route::put('/updateStatusForArchived', [App\Http\Controllers\InjuryServicesController::class, 'updateStatusForArchived']);
         Route::put('/newCase', [App\Http\Controllers\InjuryServicesController::class, 'newCase']);
         Route::put('/insertObjSubj', [App\Http\Controllers\InjuryServicesController::class, 'insertObjSubj']);
+        Route::put('/insertPlan', [App\Http\Controllers\InjuryServicesController::class, 'insertPlan']);
+        Route::put('/insertChiefComplaint', [App\Http\Controllers\InjuryServicesController::class, 'insertChiefComplaint']);
         Route::put('/updateMedilogs', [App\Http\Controllers\InjuryServicesController::class, 'updateMedilogs']);
         Route::put('/insertBillingDiagnosis', [App\Http\Controllers\InjuryServicesController::class, 'insertBillingDiagnosis']);
         Route::put('/insertDiagnosis', [App\Http\Controllers\InjuryServicesController::class, 'insertDiagnosis']);
