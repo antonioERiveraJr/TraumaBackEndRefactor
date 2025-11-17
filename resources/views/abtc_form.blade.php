@@ -26,32 +26,33 @@
             border-collapse: collapse;
         }
 
-        .head { 
+        .head {
             width: 100%;
-            text-align: center; 
-            padding: 1px;  
-            height: 10%; 
+            text-align: center;
+            padding: 1px;
+            height: 10%;
         }
 
-        .imgl{
-            height: 80px; 
-            margin-right:20%; 
-            display: inline-block; 
+        .imgl {
+            height: 80px;
+            margin-right: 20%;
+            display: inline-block;
             width: 80px;
-            vertical-align: middle; 
+            vertical-align: middle;
         }
-         .imgr {
-            height: 80px; 
-            margin-left: 20%; 
-            display: inline-block; 
+
+        .imgr {
+            height: 80px;
+            margin-left: 20%;
+            display: inline-block;
             width: 80px;
-            vertical-align: middle; 
+            vertical-align: middle;
         }
 
         .head h1 {
             width: 35%;
-            display: inline-block; 
-            margin: 0; 
+            display: inline-block;
+            margin: 0;
         }
 
         .table th,
@@ -173,13 +174,26 @@
                 </td>
                 <th style="width: 47%">Transdermal Bite</th>
                 <th style="width: 20%">3. Type of Animal: </th>
-                <td style="width: 30%">{{ $formData->TypeOfAnimal }}</td>
+                <td>@if ($formFields->animalType === 'Others')
+                    {{ $formFields->animalType_other }}
+                @else
+                        {{ $formFields->animalType }}
+                    @endif
+                </td>
+                {{-- <td style="width: 30%">{{ $formData->TypeOfAnimal }}</td> --}}
             </tr>
             <tr>
                 <td><input type="checkbox" {{ $formFields->handlingIngestion === 'Y' ? 'checked' : '' }}></td>
                 <th>Handling/Ingestion of Raw Infected Meat</th>
                 <th>4. Past History of Animal Bite</th>
-                <td>{{ $formFields->biteHistory }}</td>
+                {{-- <td>{{ $formFields->biteHistory }}</td> --}}
+                <td>
+                    @if($formFields->biteHistory === 'Yes')
+                        {{ $formFields->biteHistory_specify }}
+                    @else
+                        {{ $formFields->biteHistory }}
+                    @endif
+                </td>
             </tr>
         </table>
         <table class="table">

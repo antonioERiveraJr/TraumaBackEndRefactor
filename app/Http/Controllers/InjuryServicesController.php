@@ -1627,6 +1627,7 @@ class InjuryServicesController extends Controller
             $latestEntry = DB::table('registry.dbo.opdDataJSON')
                 ->select('enccode', 'hpercode', 'entryby', 'tStamp')
                 ->where('hpercode', $r->hpercode)
+                ->where('lockCase', null)
                 ->where('tStamp', '>=', now()->subHours(1118))
                 ->orderByDesc('tStamp')
                 ->first();
@@ -1827,6 +1828,7 @@ class InjuryServicesController extends Controller
             ->select('*')
             ->where('hpercode', '=', $r->hpercode)
             ->where('lockCase', '!=', null)
+            ->orderByDesc('tstamp')
             ->get();
         return $response;
     }
