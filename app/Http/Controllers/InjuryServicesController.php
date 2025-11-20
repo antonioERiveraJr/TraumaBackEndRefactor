@@ -1622,13 +1622,13 @@ class InjuryServicesController extends Controller
     }
     public function isOPDABTCFormUpdatable(Request $r)
     {
-        try {
+        // try {
             // Get the latest entry by hpercode
             $latestEntry = DB::table('registry.dbo.opdDataJSON')
-                ->select('enccode', 'hpercode', 'entryby', 'tStamp')
+                ->select('enccode', 'hpercode', 'entryby', 'tStamp', 'vaccineday')
                 ->where('hpercode', $r->hpercode)
                 ->where('lockCase', null)
-                ->where('tStamp', '>=', now()->subHours(1118))
+                ->where('tStamp', '>=', now()->subHours(28))
                 ->orderByDesc('tStamp')
                 ->first();
 
@@ -1638,11 +1638,11 @@ class InjuryServicesController extends Controller
             if ($latestEntry && strtolower($latestEntry->enccode) === strtolower($r->enccode)) {
                 return response()->json($latestEntry);
             } else {
-                return $this->error($r->enccode, 'No valid record found', 404);
+                return null;
             }
-        } catch (\Exception $e) {
-            return $this->error($e->getMessage(), 'Error', 500);
-        }
+        // } catch (\Exception $e) {
+        //     return $this->error($e->getMessage(), 'Error', 500);
+        // }
     }
 
     //  public function getLatestDiagnosis(Request $r)

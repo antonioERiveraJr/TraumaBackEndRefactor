@@ -106,7 +106,7 @@
             <tr>
                 <th style="width: 17%;">PhilHealth Identification Number (PIN):</th>
                 <td style="width: 33%;"></td>
-                <th style="width: 2%;"><input type="checkbox" {{ $formFields->membershipStatus === 'Member' ? 'checked' : '' }}></th>
+                <th style="width: 2%;"><input type="checkbox" {{ $formFields->membershipStatus === 'Membership' ? 'checked' : '' }}></th>
                 <td style="width: 23%;">Member</td>
                 <th style="width: 2%;"><input type="checkbox" {{ $formFields->membershipStatus === 'Dependent' ? 'checked' : '' }}></th>
                 <td style="width: 23%;">Dependent</td>
@@ -235,8 +235,14 @@
                                 <input type="checkbox" {{ $formData->firstDoseRoute === 'IM' ? 'checked' : '' }}>
                             </td>
                             <td style="width: 7%">IM</td>
-                            <td style="width:20%">{{ $formData->firstDoseDate }}</td>
-                            <td style="width:20%">{{ $formData->firstDoseBy }}</td>
+                            <td style="width:20%">@if (!empty($formData->firstDoseRoute))
+                                {{ $formData->firstDoseDate }}
+                            @endif
+                            </td>
+                            <td style="width:20%">@if (!empty($formData->firstDoseRoute))
+                                {{ $formData->firstDoseBy }}
+                            @endif
+                            </td>
                             <td style="width:20%"></td>
                         </tr>
                         <tr>
@@ -249,8 +255,14 @@
                                 <input type="checkbox" {{ $formData->secondDoseRoute === 'IM' ? 'checked' : '' }}>
                             </td>
                             <td>IM</td>
-                            <td>{{ $formData->secondDoseDate }}</td>
-                            <td>{{ $formData->secondDoseBy }}</td>
+                            <td style="width:20%">@if (!empty($formData->secondDoseRoute))
+                                {{ $formData->secondDoseDate }}
+                            @endif
+                            </td>
+                            <td style="width:20%">@if (!empty($formData->secondDoseRoute))
+                                {{ $formData->secondDoseBy }}
+                            @endif
+                            </td>
                             <td></td>
                         </tr>
                         <tr>
@@ -263,8 +275,14 @@
                                 <input type="checkbox" {{ $formData->thirdDoseRoute === 'IM' ? 'checked' : '' }}>
                             </td>
                             <td>IM</td>
-                            <td>{{ $formData->thirdDoseDate }}</td>
-                            <td>{{ $formData->thirdDoseBy }}</td>
+                            <td style="width:20%">@if (!empty($formData->thirdDoseRoute))
+                                {{ $formData->thirdDoseDate }}
+                            @endif
+                            </td>
+                            <td style="width:20%">@if (!empty($formData->thirdDoseRoute))
+                                {{ $formData->thirdDoseBy }}
+                            @endif
+                            </td>
                             <td></td>
                         </tr>
                         <tr>
@@ -277,27 +295,45 @@
                                 <input type="checkbox" {{ $formData->fourthDoseRoute === 'IM' ? 'checked' : '' }}>
                             </td>
                             <td>IM</td>
-                            <td>{{ $formData->fourthDoseDate }}</td>
-                            <td>{{ $formData->fourthDoseBy }}</td>
+                            <td style="width:20%">@if (!empty($formData->fourthDoseRoute))
+                                {{ $formData->fourthDoseDate }}
+                            @endif
+                            </td>
+                            <td style="width:20%">@if (!empty($formData->fourthDoseRoute))
+                                {{ $formData->fourthDoseBy }}
+                            @endif
+                            </td>
                             <td></td>
                         </tr>
                     </table>
                     <table class="table" style="width: 100%">
                         <tr>
                             <th style="width:40%">ERIG {{ $formData->erig }} ml</th>
-                            <td style="width:20%"></td>
+                            <td>
+                                @if (!empty($formData->erig))
+                                    {{ $formData->TreatmentStartedDate }}
+                                @endif
+                            </td>
                             <td style="width:20%"></td>
                             <td style="width:20%"></td>
                         </tr>
                         <tr>
                             <th>Tetanus Toxoid</th>
-                            <td></td>
+                            <td>
+                                @if (!empty($formData->tetanusToxoid))
+                                    {{ $formData->TreatmentStartedDate }}
+                                @endif
+                            </td>
                             <td></td>
                             <td></td>
                         </tr>
                         <tr>
                             <th>ATS</th>
-                            <td></td>
+                            <td>
+                                @if (!empty($formData->ATS))
+                                    {{ $formData->TreatmentStartedDate }}
+                                @endif
+                            </td>
                             <td></td>
                             <td></td>
                         </tr>
