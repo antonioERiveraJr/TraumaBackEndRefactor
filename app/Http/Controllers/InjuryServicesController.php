@@ -309,9 +309,10 @@ class InjuryServicesController extends Controller
     public function getABTCPhilhealthForm(Request $request)
     {
         $hpercode = $request->input('Hpercode');
+        $empID = $request->input('empID');
 
         // Call the stored procedure to get the data
-        $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?', [$hpercode]);
+        $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ? ?', [$hpercode, $empID]);
 
         // Return the data as a JSON response
         return response()->json($data);
