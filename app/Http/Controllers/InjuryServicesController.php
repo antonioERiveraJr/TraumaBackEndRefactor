@@ -306,25 +306,31 @@ class InjuryServicesController extends Controller
 
         return $uniqueResults;
     }
-    public function getABTCPhilhealthForm(Request $request)
-    {
-        $hpercode = $request->input('Hpercode');
-        $empID = $request->input('empID');
+public function getABTCPhilhealthForm(Request $request)
+{
+    $hpercode = $request->input('Hpercode'); // Expecting an integer
+    $empID = $request->input('empID'); // Expecting a string
 
-        // Call the stored procedure to get the data
-        $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ? ?', [$hpercode, $empID]);
+    // Perform validation if necessary
+    $request->validate([
+        'Hpercode' => 'required|string',
+        'empID' => 'required|string' // Ensure empID is treated as a string
+    ]);
 
-        // Return the data as a JSON response
-        return response()->json($data);
-    }
+    // Call the stored procedure to get the data
+    $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?, ?', [$hpercode, $empID]);
 
+    // Return the data as a JSON response
+    return response()->json($data);
+}
     public function previewPDF(Request $request)
     {
         // If you need to fetch the data for preview
         $hpercode = $request->input('hpercode'); // Ensure this is passed in the request
+        $empID = $request->input('empID');
 
         // Call the stored procedure to get the data
-        $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?', [$hpercode]);
+        $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?, ?', [$hpercode, $empID]);
         // Check if data is returned
         if (empty($data)) {
             return response()->json(['error' => 'No data found'], 404);
@@ -339,10 +345,11 @@ class InjuryServicesController extends Controller
     public function generateABTCPdf(Request $request)
     {
         $hpercode = $request->input('Hpercode');
+        $empID = $request->input('empID'); // Expecting a string
 
         $formFields = (object) $request->formFields;
         // Call the stored procedure to get the data
-        $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?', [$hpercode]);
+        $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?, ?', [$hpercode, $empID]);
 
         // Check if data is returned
         if (empty($data)) {
