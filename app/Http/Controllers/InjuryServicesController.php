@@ -1320,27 +1320,27 @@ public function getABTCPhilhealthForm(Request $request)
     {
         try {
             // update when latest form and same ID
-            if ($r->isUpdateForm) {
-                $result = DB::table('hospital.dbo.ufive_cli_plan')
-                    ->where('id', $r->ufiveID)
-                    ->where('enccode', $r->enccode)
-                    ->update([
-                        'pplan' => $r->plan,
-                        'entry_by' => $r->entryby,
-                        'created_at' => now(),
-                        'updated_at' => now()
-                    ]);
-            } else {
+            // if ($r->isUpdateForm) {
+            //     $result = DB::table('hospital.dbo.ufive_cli_plan')
+            //         ->where('id', $r->ufiveID)
+            //         ->where('enccode', $r->enccode)
+            //         ->update([
+            //             'pplan' => $r->plan,
+            //             'entry_by' => $r->entryby,
+            //             'created_at' => now(),
+            //             'updated_at' => now()
+            //         ]);
+            // } else {
                 $result = DB::table('hospital.dbo.ufive_cli_plan')->insertGetId([
                     'enccode' => $r->enccode,
-                    'pplan' => $r->plan,
                     'hpercode' => $r->hpercode,
+                    'pplan' => $r->plan,
                     'entry_by' => $r->entryby,
                     'created_at' => now(),
                     'updated_at' => now(),
                     'order_at' => now()
                 ]);
-            }
+            // }
 
             if ($result) {
                 return $this->success(['id' => $result], 'Success', 200);
@@ -1354,26 +1354,26 @@ public function getABTCPhilhealthForm(Request $request)
     {
         try {
             // update when latest form and same ID
-            if ($r->isUpdateForm) {
-                $result = DB::table('hospital.les.cf4ChiefComplaint')
-                    ->where('id', $r->ufiveID)
-                    ->where('enccode', $r->enccode)
-                    ->update([
-                        'chief_complaint' => $r->plan,
-                        'entry_by' => $r->entryby,
-                        'created_at' => now(),
-                        'updated_at' => now()
-                    ]);
-            } else {
+            // if ($r->isUpdateForm) {
+            //     $result = DB::table('hospital.les.cf4ChiefComplaint')
+            //         ->where('id', $r->ufiveID)
+            //         ->where('enccode', $r->enccode)
+            //         ->update([
+            //             'chief_complaint' => $r->plan,
+            //             'entry_by' => $r->entryby,
+            //             'created_at' => now(),
+            //             'updated_at' => now()
+            //         ]);
+            // } else {
                 $result = DB::table('hospital.les.cf4ChiefComplaint')->insertGetId([
                     'enccode' => $r->enccode,
-                    'chief_complaint' => $r->plan,
+                    'chief_complaint' => $r->chief_complaint,
                     'hpercode' => $r->hpercode,
                     'entry_by' => $r->entryby,
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
-            }
+            // }
 
             if ($result) {
                 return $this->success(['id' => $result], 'Success', 200);
