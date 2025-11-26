@@ -306,23 +306,23 @@ class InjuryServicesController extends Controller
 
         return $uniqueResults;
     }
-public function getABTCPhilhealthForm(Request $request)
-{
-    $hpercode = $request->input('Hpercode'); // Expecting an integer
-    $empID = $request->input('empID'); // Expecting a string
+    public function getABTCPhilhealthForm(Request $request)
+    {
+        $hpercode = $request->input('Hpercode'); // Expecting an integer
+        $empID = $request->input('empID'); // Expecting a string
 
-    // Perform validation if necessary
-    $request->validate([
-        'Hpercode' => 'required|string',
-        'empID' => 'required|string' // Ensure empID is treated as a string
-    ]);
+        // Perform validation if necessary
+        $request->validate([
+            'Hpercode' => 'required|string',
+            'empID' => 'required|string' // Ensure empID is treated as a string
+        ]);
 
-    // Call the stored procedure to get the data
-    $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?, ?', [$hpercode, $empID]);
+        // Call the stored procedure to get the data
+        $data = DB::select('EXEC registry.dbo.getABTCPhilhealthForm ?, ?', [$hpercode, $empID]);
 
-    // Return the data as a JSON response
-    return response()->json($data);
-}
+        // Return the data as a JSON response
+        return response()->json($data);
+    }
     public function previewPDF(Request $request)
     {
         // If you need to fetch the data for preview
@@ -1288,16 +1288,51 @@ public function getABTCPhilhealthForm(Request $request)
             // ]);
             // update when latest form and same ID
             if ($r->isUpdateForm) {
-                $result = DB::table('hospital.dbo.ufive_cli_finding')
-                    ->where('id', $r->ufiveID)
-                    ->where('enccode', $r->enccode)
-                    ->update([
-                        'objective' => is_array($r->objective) ? implode(', ', $r->objective) : $r->objective,
-                        'finding' => $r->subjective,
-                        'hpercode' => $r->hpercode,
-                        'entry_by' => $r->entryby,
-                        'updated_at' => now()
-                    ]);
+
+                if (is_null($r->ufiveID)) {
+                    // Get the latest created_at value for the specified enccode
+                    $latestCreatedAt = DB::table('hospital.dbo.ufive_cli_finding')
+                        ->where('enccode', $r->enccode)
+                        ->orderBy('created_at', 'desc')
+                        ->value('created_at'); // Get the latest created_at timestamp
+
+                    if ($latestCreatedAt) {
+                        // Update the entry where enccode and created_at match
+                        $result = DB::table('hospital.dbo.ufive_cli_finding')
+                            ->where('enccode', $r->enccode)
+                            ->where('created_at', $latestCreatedAt) // Use the latest created_at
+                            ->update([
+                                'objective' => is_array($r->objective) ? implode(', ', $r->objective) : $r->objective,
+                                'finding' => $r->subjective,
+                                'hpercode' => $r->hpercode,
+                                'entry_by' => $r->entryby,
+                                'updated_at' => now()
+                            ]);
+                    }
+                } else {
+                    // If ufiveID is provided, perform an update on that specific record
+                    $result = DB::table('hospital.dbo.ufive_cli_finding')
+                        ->where('id', $r->ufiveID)
+                        ->where('enccode', $r->enccode)
+                        ->update([
+                            'objective' => is_array($r->objective) ? implode(', ', $r->objective) : $r->objective,
+                            'finding' => $r->subjective,
+                            'hpercode' => $r->hpercode,
+                            'entry_by' => $r->entryby,
+                            'updated_at' => now()
+                        ]);
+                }
+                // $result = DB::table('hospital.dbo.ufive_cli_finding')
+                //     ->where('id', $r->ufiveID)
+                //     ->where('enccode', $r->enccode)
+                //     ->update([
+                //         'objective' => is_array($r->objective) ? implode(', ', $r->objective) : $r->objective,
+                //         'finding' => $r->subjective,
+                //         'hpercode' => $r->hpercode,
+                //         'entry_by' => $r->entryby,
+                //         'updated_at' => now()
+                //     ]);
+
             } else {
                 $result = DB::table('hospital.dbo.ufive_cli_finding')->insertGetId([
                     'enccode' => $r->enccode,
@@ -1320,17 +1355,48 @@ public function getABTCPhilhealthForm(Request $request)
     {
         try {
             // update when latest form and same ID
-            // if ($r->isUpdateForm) {
-            //     $result = DB::table('hospital.dbo.ufive_cli_plan')
-            //         ->where('id', $r->ufiveID)
-            //         ->where('enccode', $r->enccode)
-            //         ->update([
-            //             'pplan' => $r->plan,
-            //             'entry_by' => $r->entryby,
-            //             'created_at' => now(),
-            //             'updated_at' => now()
-            //         ]);
-            // } else {
+            if ($r->isUpdateForm) {
+                // if (is_null($r->ufiveID)) {
+                // Get the latest created_at value for the specified enccode
+                $latestCreatedAt = DB::table('hospital.dbo.ufive_cli_plan')
+                    ->where('enccode', $r->enccode)
+                    ->orderBy('created_at', 'desc')
+                    ->value('created_at'); // Get the latest created_at timestamp
+
+                if ($latestCreatedAt) {
+                    // Update the entry where enccode and created_at match
+                    $result = DB::table('hospital.dbo.ufive_cli_plan')
+                        ->where('enccode', $r->enccode)
+                        ->where('created_at', $latestCreatedAt) // Use the latest created_at
+                        ->update([
+                            'pplan' => $r->plan,
+                            'entry_by' => $r->entryby,
+                            'updated_at' => now() // Update updated_at field
+                            // Note: Do NOT change created_at
+                        ]);
+                }
+                // } else {
+                //     // If ufiveID is provided, perform an update on that specific record
+                //     $result = DB::table('hospital.dbo.ufive_cli_plan')
+                //         ->where('id', $r->ufiveID)
+                //         ->where('enccode', $r->enccode)
+                //         ->update([
+                //             'pplan' => $r->plan,
+                //             'entry_by' => $r->entryby,
+                //             'updated_at' => now() // Update updated_at field
+                //             // Note: Do NOT change created_at
+                //         ]);
+                // }
+                // $result = DB::table('hospital.dbo.ufive_cli_plan')
+                //     ->where('id', $r->ufiveID)
+                //     ->where('enccode', $r->enccode)
+                //     ->update([
+                //         'pplan' => $r->plan,
+                //         'entry_by' => $r->entryby,
+                //         'created_at' => now(),
+                //         'updated_at' => now()
+                //     ]);
+            } else {
                 $result = DB::table('hospital.dbo.ufive_cli_plan')->insertGetId([
                     'enccode' => $r->enccode,
                     'hpercode' => $r->hpercode,
@@ -1340,7 +1406,7 @@ public function getABTCPhilhealthForm(Request $request)
                     'updated_at' => now(),
                     'order_at' => now()
                 ]);
-            // }
+            }
 
             if ($result) {
                 return $this->success(['id' => $result], 'Success', 200);
@@ -1354,17 +1420,48 @@ public function getABTCPhilhealthForm(Request $request)
     {
         try {
             // update when latest form and same ID
-            // if ($r->isUpdateForm) {
-            //     $result = DB::table('hospital.les.cf4ChiefComplaint')
-            //         ->where('id', $r->ufiveID)
-            //         ->where('enccode', $r->enccode)
-            //         ->update([
-            //             'chief_complaint' => $r->plan,
-            //             'entry_by' => $r->entryby,
-            //             'created_at' => now(),
-            //             'updated_at' => now()
-            //         ]);
-            // } else {
+            if ($r->isUpdateForm) {
+                // if (is_null($r->ufiveID)) {
+                    // Get the latest created_at value for the specified enccode
+                    $latestCreatedAt = DB::table('hospital.les.cf4ChiefComplaint')
+                        ->where('enccode', $r->enccode)
+                        ->orderBy('created_at', 'desc')
+                        ->value('created_at'); // Get the latest created_at timestamp
+
+                    if ($latestCreatedAt) {
+                        // Update the entry where enccode and created_at match
+                        $result = DB::table('hospital.les.cf4ChiefComplaint')
+                            ->where('enccode', $r->enccode)
+                            ->where('created_at', $latestCreatedAt) // Use the latest created_at
+                            ->update([
+                                'chief_complaint' => $r->chief_complaint,
+                                'entry_by' => $r->entryby,
+                                'updated_at' => now() // Update updated_at field
+                                // Note: Do NOT change created_at
+                            ]);
+                    }
+                // } else {
+                //     // If ufiveID is provided, perform an update on that specific record
+                //     $result = DB::table('hospital.les.cf4ChiefComplaint')
+                //         ->where('id', $r->ufiveID)
+                //         ->where('enccode', $r->enccode)
+                //         ->update([
+                //             'chief_complaint' => $r->plan,
+                //             'entry_by' => $r->entryby,
+                //             'updated_at' => now() // Update updated_at field
+                //             // Note: Do NOT change created_at
+                //         ]);
+                // }
+                // $result = DB::table('hospital.les.cf4ChiefComplaint')
+                //     ->where('id', $r->ufiveID)
+                //     ->where('enccode', $r->enccode)
+                //     ->update([
+                //         'chief_complaint' => $r->plan,
+                //         'entry_by' => $r->entryby,
+                //         'created_at' => now(),
+                //         'updated_at' => now()
+                //     ]);
+            } else {
                 $result = DB::table('hospital.les.cf4ChiefComplaint')->insertGetId([
                     'enccode' => $r->enccode,
                     'chief_complaint' => $r->chief_complaint,
@@ -1373,7 +1470,7 @@ public function getABTCPhilhealthForm(Request $request)
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
-            // }
+            }
 
             if ($result) {
                 return $this->success(['id' => $result], 'Success', 200);
@@ -1631,23 +1728,23 @@ public function getABTCPhilhealthForm(Request $request)
     public function isOPDABTCFormUpdatable(Request $r)
     {
         // try {
-            // Get the latest entry by hpercode
-            $latestEntry = DB::table('registry.dbo.opdDataJSON')
-                ->select('enccode', 'hpercode', 'entryby', 'tStamp', 'vaccineday')
-                ->where('hpercode', $r->hpercode)
-                ->where('lockCase', null)
-                ->where('tStamp', '>=', now()->subHours(28))
-                ->orderByDesc('tStamp')
-                ->first();
+        // Get the latest entry by hpercode
+        $latestEntry = DB::table('registry.dbo.opdDataJSON')
+            ->select('enccode', 'hpercode', 'entryby', 'tStamp', 'vaccineday')
+            ->where('hpercode', $r->hpercode)
+            ->where('lockCase', null)
+            ->where('tStamp', '>=', now()->subHours(28))
+            ->orderByDesc('tStamp')
+            ->first();
 
-            // Check if the latest entry exists and if the enccode matches
-            // if ($latestEntry && $latestEntry->enccode === $r->enccode) {
-            //     return response()->json($latestEntry);
-            if ($latestEntry && strtolower($latestEntry->enccode) === strtolower($r->enccode)) {
-                return response()->json($latestEntry);
-            } else {
-                return null;
-            }
+        // Check if the latest entry exists and if the enccode matches
+        // if ($latestEntry && $latestEntry->enccode === $r->enccode) {
+        //     return response()->json($latestEntry);
+        if ($latestEntry && strtolower($latestEntry->enccode) === strtolower($r->enccode)) {
+            return response()->json($latestEntry);
+        } else {
+            return null;
+        }
         // } catch (\Exception $e) {
         //     return $this->error($e->getMessage(), 'Error', 500);
         // }
