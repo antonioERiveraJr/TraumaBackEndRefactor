@@ -1375,6 +1375,21 @@ class InjuryServicesController extends Controller
                             // Note: Do NOT change created_at
                         ]);
                 }
+                
+                //i save mo as new nu awan ti record na nga old 
+                // else{
+                //      $result = DB::table('hospital.dbo.ufive_cli_plan')->insertGetId([
+                //     'enccode' => $r->enccode,
+                //     'hpercode' => $r->hpercode,
+                //     'pplan' => $r->plan,
+                //     'entry_by' => $r->entryby,
+                //     'created_at' => now(),
+                //     'updated_at' => now(),
+                //     'order_at' => now()
+                // ]);
+                // }
+
+
                 // } else {
                 //     // If ufiveID is provided, perform an update on that specific record
                 //     $result = DB::table('hospital.dbo.ufive_cli_plan')
@@ -1422,24 +1437,37 @@ class InjuryServicesController extends Controller
             // update when latest form and same ID
             if ($r->isUpdateForm) {
                 // if (is_null($r->ufiveID)) {
-                    // Get the latest created_at value for the specified enccode
-                    $latestCreatedAt = DB::table('hospital.les.cf4ChiefComplaint')
-                        ->where('enccode', $r->enccode)
-                        ->orderBy('created_at', 'desc')
-                        ->value('created_at'); // Get the latest created_at timestamp
+                // Get the latest created_at value for the specified enccode
+                $latestCreatedAt = DB::table('hospital.les.cf4ChiefComplaint')
+                    ->where('enccode', $r->enccode)
+                    ->orderBy('created_at', 'desc')
+                    ->value('created_at'); // Get the latest created_at timestamp
 
-                    if ($latestCreatedAt) {
-                        // Update the entry where enccode and created_at match
-                        $result = DB::table('hospital.les.cf4ChiefComplaint')
-                            ->where('enccode', $r->enccode)
-                            ->where('created_at', $latestCreatedAt) // Use the latest created_at
-                            ->update([
-                                'chief_complaint' => $r->chief_complaint,
-                                'entry_by' => $r->entryby,
-                                'updated_at' => now() // Update updated_at field
-                                // Note: Do NOT change created_at
-                            ]);
-                    }
+                if ($latestCreatedAt) {
+                    // Update the entry where enccode and created_at match
+                    $result = DB::table('hospital.les.cf4ChiefComplaint')
+                        ->where('enccode', $r->enccode)
+                        ->where('created_at', $latestCreatedAt) // Use the latest created_at
+                        ->update([
+                            'chief_complaint' => $r->chief_complaint,
+                            'entry_by' => $r->entryby,
+                            'updated_at' => now() // Update updated_at field
+                            // Note: Do NOT change created_at
+                        ]);
+                } 
+                //i save mo as new nu awan ti record na nga old 
+                // else {
+                //     $result = DB::table('hospital.les.cf4ChiefComplaint')->insertGetId([
+                //         'enccode' => $r->enccode,
+                //         'chief_complaint' => $r->chief_complaint,
+                //         'hpercode' => $r->hpercode,
+                //         'entry_by' => $r->entryby,
+                //         'created_at' => now(),
+                //         'updated_at' => now()
+                //     ]);
+                // }
+
+
                 // } else {
                 //     // If ufiveID is provided, perform an update on that specific record
                 //     $result = DB::table('hospital.les.cf4ChiefComplaint')
