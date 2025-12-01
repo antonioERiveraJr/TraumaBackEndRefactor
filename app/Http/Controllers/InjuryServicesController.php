@@ -1371,11 +1371,12 @@ class InjuryServicesController extends Controller
                         ->update([
                             'pplan' => $r->plan,
                             'entry_by' => $r->entryby,
+                            'progress_notes' => $r->notes,
                             'updated_at' => now() // Update updated_at field
                             // Note: Do NOT change created_at
                         ]);
                 }
-                
+
                 //i save mo as new nu awan ti record na nga old 
                 // else{
                 //      $result = DB::table('hospital.dbo.ufive_cli_plan')->insertGetId([
@@ -1416,6 +1417,7 @@ class InjuryServicesController extends Controller
                     'enccode' => $r->enccode,
                     'hpercode' => $r->hpercode,
                     'pplan' => $r->plan,
+                    'progress_notes' => $r->notes,
                     'entry_by' => $r->entryby,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -1454,7 +1456,7 @@ class InjuryServicesController extends Controller
                             'updated_at' => now() // Update updated_at field
                             // Note: Do NOT change created_at
                         ]);
-                } 
+                }
                 //i save mo as new nu awan ti record na nga old 
                 // else {
                 //     $result = DB::table('hospital.les.cf4ChiefComplaint')->insertGetId([
