@@ -98,9 +98,13 @@ Route::group(
         Route::get('/checkPatientTSSRecord', [App\Http\Controllers\InjuryServicesController::class, 'checkPatientTSSRecord']);
         Route::get('/getEmployeeName', [App\Http\Controllers\InjuryServicesController::class, 'getEmployeeName']);
         Route::get('/getPatientReferral', [App\Http\Controllers\InjuryServicesController::class, 'getPatientReferral']);
-
+        Route::get('/getERBackLog', [App\Http\Controllers\InjuryServicesController::class, 'getERBackLog']);
         // Route for fetching ABTC form data
         Route::get('/getABTCPhilhealthForm', [InjuryServicesController::class, 'getABTCPhilhealthForm']);
+
+        
+        //List of Unfinished OPD ABTC Form
+        Route::get('/getUnfinishedOPDABTCForms', [App\Http\Controllers\InjuryServicesController::class, 'getUnfinishedOPDABTCForms']);
 
         // Route for generating the PDF
         Route::post('/generate-pdf', [InjuryServicesController::class, 'generateABTCPdf']);
@@ -129,6 +133,7 @@ Route::group(
         Route::get('/getFormDetail', [App\Http\Controllers\InjuryServicesController::class, 'getFormDetail']);
         Route::put('/updateStatusForArchived', [App\Http\Controllers\InjuryServicesController::class, 'updateStatusForArchived']);
         Route::put('/newCase', [App\Http\Controllers\InjuryServicesController::class, 'newCase']);
+        Route::put('/deleteABTCOPDCase', [App\Http\Controllers\InjuryServicesController::class, 'deleteABTCOPDCase']);
         Route::put('/insertObjSubj', [App\Http\Controllers\InjuryServicesController::class, 'insertObjSubj']);
         Route::put('/insertPlan', [App\Http\Controllers\InjuryServicesController::class, 'insertPlan']);
         Route::put('/insertChiefComplaint', [App\Http\Controllers\InjuryServicesController::class, 'insertChiefComplaint']);
@@ -165,6 +170,7 @@ Route::group(
 
 //List of Unfinished Doctor's TSS Form
 Route::get('/getUnfinishedTSSForms', [App\Http\Controllers\InjuryServicesController::class, 'getUnfinishedTSSForms']);
+
 
 // moved export to unguarded
 Route::post('/getArrayFromFrontEnd', [App\Http\Controllers\InjuryServicesController::class, 'getArrayFromFrontEnd']);

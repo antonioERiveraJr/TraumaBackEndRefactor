@@ -174,6 +174,16 @@ class InjuryServicesController extends Controller
             ->get();
         return $result;
     }
+   public function getUnfinishedOPDABTCForms(Request $r)
+{
+    $result = DB::table('registry.injury.vwUnfinishedOPDABTCList')
+        ->select('*')
+        ->orderBy('encounter_date', 'desc')  // Adding ORDER BY here
+        ->get();
+    
+    return $result;
+}
+
 
     // OLD TRAUMA SURVEILLANCE SYSTEM (TSS)
     // public function injuryList3(Request $r)
@@ -742,6 +752,27 @@ class InjuryServicesController extends Controller
             return $this->injuryPatientDevNoData($r);
         }
     }
+
+        public function getERBackLog(Request $request)
+    { 
+
+        // Retrieve the hpercode from the request
+        $hpercode = $request->hpercode;
+
+        // Use Query Builder to construct the query
+        $results = DB::table('hospital.dbo.hecase as hec')
+            ->select('hec.enccode', 'pla.created_at', 'hec.hpercode', 'pla.pplan')
+            ->distinct()
+            ->join('hospital.dbo.herlog as her', 'her.hpercode', '=', 'hec.hpercode')
+            ->leftJoin('hospital.dbo.ufive_cli_plan as pla', 'pla.enccode', '=', 'hec.enccode')
+            ->where('hec.iistat', 'A')
+            ->where('her.tscode', 'FAMED')
+            ->where('hec.hpercode', $hpercode)
+            ->get();
+
+        // Return results as JSON
+        return response()->json($results);
+    }
     public function admittedInjuryListData(Request $r)
     {
 
@@ -1184,6 +1215,19 @@ class InjuryServicesController extends Controller
                         'diagtext' => $r->diagnosis,
                         'updated_at' => now(),
                     ]);
+                if (!$updatetResult) {
+                    $insertResult = DB::table('hospital.dbo.hencdiag_adm')
+                        ->insert([
+                            'diagtext' => $r->diagnosis,
+                            'enccode' => $r->enccode,
+                            'entry_by' => $r->user,
+                            'entryby' => $r->user,
+                            'licno' => DB::raw("(SELECT licno FROM hospital.dbo.hprovider WHERE employeeid = '$r->user')"),
+                            'primediag' => 'Y',
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ]);
+                }
             } else {
                 // Update previous primary diagnosis to non-primary
                 $updateResult = DB::table('hospital.dbo.hencdiag_adm')
@@ -1340,6 +1384,8 @@ class InjuryServicesController extends Controller
                     'finding' => $r->subjective,
                     'hpercode' => $r->hpercode,
                     'entry_by' => $r->entryby,
+                    'created_at' => now(),
+                    'updated_at' => now()
                 ]);
             }
 
@@ -1375,20 +1421,18 @@ class InjuryServicesController extends Controller
                             'updated_at' => now() // Update updated_at field
                             // Note: Do NOT change created_at
                         ]);
+                } else { //i save mo as new nu awan ti record na nga old 
+                    $result = DB::table('hospital.dbo.ufive_cli_plan')->insertGetId([
+                        'enccode' => $r->enccode,
+                        'hpercode' => $r->hpercode,
+                        'pplan' => $r->plan,
+                        'progress_notes' => $r->notes,
+                        'entry_by' => $r->entryby,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                        'order_at' => now()
+                    ]);
                 }
-
-                //i save mo as new nu awan ti record na nga old 
-                // else{
-                //      $result = DB::table('hospital.dbo.ufive_cli_plan')->insertGetId([
-                //     'enccode' => $r->enccode,
-                //     'hpercode' => $r->hpercode,
-                //     'pplan' => $r->plan,
-                //     'entry_by' => $r->entryby,
-                //     'created_at' => now(),
-                //     'updated_at' => now(),
-                //     'order_at' => now()
-                // ]);
-                // }
 
 
                 // } else {
@@ -1456,6 +1500,16 @@ class InjuryServicesController extends Controller
                             'updated_at' => now() // Update updated_at field
                             // Note: Do NOT change created_at
                         ]);
+                } else {
+
+                    $result = DB::table('hospital.les.cf4ChiefComplaint')->insertGetId([
+                        'enccode' => $r->enccode,
+                        'chief_complaint' => $r->chief_complaint,
+                        'hpercode' => $r->hpercode,
+                        'entry_by' => $r->entryby,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
                 }
                 //i save mo as new nu awan ti record na nga old 
                 // else {
@@ -1546,6 +1600,22 @@ class InjuryServicesController extends Controller
                 ->where('lockCase', '=', null)
                 ->update([
                     'lockCase' => now()
+                ]);
+
+            if ($result) {
+                return $this->success($result, 'Success', 200);
+            }
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 'Error', 500);
+        }
+    }
+    function deleteABTCOPDCase(Request $r)
+    {
+        try {
+            $result = DB::table('registry.dbo.opdDataJSON')
+                ->where('enccode', '=', $r->enccode)
+                ->update([
+                    'deleted_at' => now()
                 ]);
 
             if ($result) {
@@ -1882,6 +1952,7 @@ class InjuryServicesController extends Controller
             ->select('data', 'vaccineday', 'tStamp', 'primeTSS', 'prophylaxis')
             ->where('hpercode', '=', $r->hpercode)
             ->where('lockCase', '=', null)
+            ->where('deleted_at', '=', null)
             // ->where('prophylaxis', '=', $r->prophylaxis)
             // ->orderBy('tStamp')
 
@@ -1956,6 +2027,7 @@ class InjuryServicesController extends Controller
 
     //     return response()->json($result[0]);
     // }
+
 
     public function getPatientABTCLog(Request $r)
     {

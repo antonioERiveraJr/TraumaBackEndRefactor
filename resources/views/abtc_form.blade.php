@@ -328,7 +328,12 @@
                             <td></td>
                         </tr>
                         <tr>
-                            <th>ATS</th>
+                            <th>
+                                ATS 
+                                @if(!empty($formData->ats_num))
+                                    {{ $formData->ats_num }} ui
+                                @endif 
+                            </th>
                             <td>
                                 @if (!empty($formData->ATS))
                                     {{ $formData->TreatmentStartedDate }}
