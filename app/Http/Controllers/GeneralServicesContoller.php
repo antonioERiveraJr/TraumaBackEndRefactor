@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Traits\HttpResponses;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log as FacadesLog;
+use Illuminate\Support\Facades\Log as Log;
 
 class GeneralServicesContoller extends Controller
 {
@@ -45,12 +45,32 @@ class GeneralServicesContoller extends Controller
     }
 
 
+    // public function newlocations(Request $r)
+    // {
+    //     $result = Cache::remember('newlocations', 3600, function () {
+    //         return DB::select('exec registry.dbo.getONEISSLocations');
+    //     });
+    //     return $result;
+    // }
     public function newlocations(Request $r)
     {
-        $result = Cache::remember('newlocations', 3600, function () {
-            return DB::select('exec registry.dbo.getONEISSLocations');
-        });
-        return $result;
+        // Attempt to retrieve cached data
+        $cachedData = Cache::get('newlocations');
+
+        if ($cachedData) {
+            // Log that the cached data is being used
+            Log::info('Using cached data for new locations.');
+            return response()->json($cachedData);
+        }
+
+        // If cache doesn't exist, fetch fresh data
+        Log::info('Fetching fresh data from the database for new locations.');
+        $result = DB::select('exec registry.dbo.getONEISSLocations');
+
+        // Store the result in cache for 24 hours
+        Cache::put('newlocations', $result, 24 * 60); // Cache for 24 hours
+
+        return response()->json($result);
     }
 
 

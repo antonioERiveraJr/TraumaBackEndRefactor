@@ -174,15 +174,15 @@ class InjuryServicesController extends Controller
             ->get();
         return $result;
     }
-   public function getUnfinishedOPDABTCForms(Request $r)
-{
-    $result = DB::table('registry.injury.vwUnfinishedOPDABTCList')
-        ->select('*')
-        ->orderBy('encounter_date', 'desc')  // Adding ORDER BY here
-        ->get();
-    
-    return $result;
-}
+    public function getUnfinishedOPDABTCForms(Request $r)
+    {
+        $result = DB::table('registry.injury.vwUnfinishedOPDABTCList')
+            ->select('*')
+            ->orderBy('encounter_date', 'desc')  // Adding ORDER BY here
+            ->get();
+
+        return $result;
+    }
 
 
     // OLD TRAUMA SURVEILLANCE SYSTEM (TSS)
@@ -371,10 +371,10 @@ class InjuryServicesController extends Controller
         // Prepare the view with the data
         $pdf = Pdf::loadView('abtc_form', ['formData' => $data[0], 'formFields' => $formFields]);
 
-        FacadesLog::info('Form Data:', [
-            'data' => $data[0],
-            'formField' => $formFields
-        ]);
+        // FacadesLog::info('Form Data:', [
+        //     'data' => $data[0],
+        //     'formField' => $formFields
+        // ]);
 
         return $pdf->stream('ABTC_Philhealth_Form.pdf');
     }
@@ -753,12 +753,10 @@ class InjuryServicesController extends Controller
         }
     }
 
-        public function getERBackLog(Request $request)
-    { 
-
-        // Retrieve the hpercode from the request
-        $hpercode = $request->hpercode;
-
+    public function getERBackLog(Request $r)
+    {
+        // dd($r);
+        // Retrieve the hpercode from the request  
         // Use Query Builder to construct the query
         $results = DB::table('hospital.dbo.hecase as hec')
             ->select('hec.enccode', 'pla.created_at', 'hec.hpercode', 'pla.pplan')
@@ -767,7 +765,7 @@ class InjuryServicesController extends Controller
             ->leftJoin('hospital.dbo.ufive_cli_plan as pla', 'pla.enccode', '=', 'hec.enccode')
             ->where('hec.iistat', 'A')
             ->where('her.tscode', 'FAMED')
-            ->where('hec.hpercode', $hpercode)
+            ->where('hec.hpercode', $r->hpercode)
             ->get();
 
         // Return results as JSON
@@ -1352,6 +1350,16 @@ class InjuryServicesController extends Controller
                                 'entry_by' => $r->entryby,
                                 'updated_at' => now()
                             ]);
+                    } else {
+                        $result = DB::table('hospital.dbo.ufive_cli_finding')->insertGetId([
+                            'enccode' => $r->enccode,
+                            'objective' => is_array($r->objective) ? implode(', ', $r->objective) : $r->objective,
+                            'finding' => $r->subjective,
+                            'hpercode' => $r->hpercode,
+                            'entry_by' => $r->entryby,
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ]);
                     }
                 } else {
                     // If ufiveID is provided, perform an update on that specific record
@@ -1614,9 +1622,12 @@ class InjuryServicesController extends Controller
         try {
             $result = DB::table('registry.dbo.opdDataJSON')
                 ->where('enccode', '=', $r->enccode)
+                ->where('deleted_at', '=', null)
                 ->update([
-                    'deleted_at' => now()
+                    'deleted_at' => now(),
+                    'deleted_by' => $r->user
                 ]);
+
 
             if ($result) {
                 return $this->success($result, 'Success', 200);
@@ -1948,14 +1959,20 @@ class InjuryServicesController extends Controller
     // }
     public function checkPatientTSSRecord(Request $r)
     {
-        $patientsData = DB::table('registry.dbo.opdDataJSON')
+        // Start shaping the query
+        $query = DB::table('registry.dbo.opdDataJSON')
             ->select('data', 'vaccineday', 'tStamp', 'primeTSS', 'prophylaxis')
             ->where('hpercode', '=', $r->hpercode)
-            ->where('lockCase', '=', null)
-            ->where('deleted_at', '=', null)
-            // ->where('prophylaxis', '=', $r->prophylaxis)
-            // ->orderBy('tStamp')
+            ->where('lockCase', '=', null);
 
+        // Add condition for deleted_at based on primeTSS value
+        $query->where(function ($query) use ($r) {
+            $query->where('primeTSS', '=', 'Y')
+                ->orWhere('deleted_at', '=', null);
+        });
+
+        // Order by tStamp in descending order and get distinct records
+        $patientsData = $query
             ->orderByDesc('tStamp')
             ->distinct()
             ->get();
@@ -1975,6 +1992,50 @@ class InjuryServicesController extends Controller
 
         return $decodedData;
     }
+
+    //     public function checkPatientTSSRecord(Request $r)
+    // {
+    //     // Fetch the primeTSS value from the database
+    //     $primeTSSRecord = DB::table('registry.dbo.opdDataJSON')
+    //         ->where('hpercode', '=', $r->hpercode)
+    //         ->select('primeTSS')
+    //         ->first();
+
+    //     // Check if we found a record and get the value of primeTSS
+    //     $isPrimeTSS = ($primeTSSRecord && $primeTSSRecord->primeTSS === 'Y');
+
+    //     // Start the main query
+    //     $query = DB::table('registry.dbo.opdDataJSON')
+    //         ->select('data', 'vaccineday', 'tStamp', 'primeTSS', 'prophylaxis')
+    //         ->where('hpercode', '=', $r->hpercode)
+    //         ->where('lockCase', '=', null);
+
+    //     // Add condition for deleted_at based on the value of primeTSS from the database
+    //     if (!$isPrimeTSS) {
+    //         $query->where('deleted_at', '=', null);
+    //     }
+
+    //     // Add ordering and distinct selection
+    //     $patientsData = $query
+    //         ->orderByDesc('tStamp')
+    //         ->distinct()
+    //         ->get();
+
+    //     $decodedData = [];
+
+    //     foreach ($patientsData as $patient) {
+    //         // Decode the JSON data and format the tStamp
+    //         $decodedData[] = [
+    //             'vaccineday' => $patient->vaccineday,
+    //             'data' => json_decode($patient->data),
+    //             'tStamp' => Carbon::parse($patient->tStamp)->format('Y-m-d'), // Format to 'YYYY-MM-DD'
+    //             'primeTSS' => $patient->primeTSS,
+    //             'prophylaxis' => $patient->prophylaxis
+    //         ];
+    //     }
+
+    //     return $decodedData;
+    // }
 
     public function getEmployeeName(Request $r)
     {
@@ -2040,25 +2101,64 @@ class InjuryServicesController extends Controller
         return $response;
     }
 
+    // public function opdPatientData(Request $r)
+    // {
+    //     $result = DB::select('exec registry.injury.GetInjuryPatientByEnccode ?', [$r->enccode]);
+
+    //     if (empty($result)) {
+    //         return response()->json(['message' => 'No data found'], 404);
+    //     }
+
+    //     $decodedData = json_decode($result[0]->data);
+
+    //     $responseData = [
+    //         'patientname' => $result[0]->patientname,
+    //         'hpercode' => $result[0]->hpercode,
+    //         'enccode' => $result[0]->enccode,
+    //         'opdtime' => $result[0]->opdtime,
+    //         'patientbirthdate' => $result[0]->patientbirthdate,
+    //         'data' => $decodedData,
+    //         'vaccineday' => $result[0]->vaccineday,
+    //         'lockCase' => $result[0]->lockCase
+    //     ];
+
+    //     return response()->json($responseData);
+    // }
+
     public function opdPatientData(Request $r)
     {
         $result = DB::select('exec registry.injury.GetInjuryPatientByEnccode ?', [$r->enccode]);
 
+        // Check if the result is empty
         if (empty($result)) {
             return response()->json(['message' => 'No data found'], 404);
         }
 
-        $decodedData = json_decode($result[0]->data);
+        // Find the record with primetss = 'Y'
+        $preferredRecord = null;
+        foreach ($result as $record) {
+            if ($record->primetss === 'Y') {
+                $preferredRecord = $record;
+                break; // Exit loop once found
+            }
+        }
+
+        // If no preferred record is found, default to the first result
+        if (!$preferredRecord) {
+            $preferredRecord = $result[0];
+        }
+
+        $decodedData = json_decode($preferredRecord->data);
 
         $responseData = [
-            'patientname' => $result[0]->patientname,
-            'hpercode' => $result[0]->hpercode,
-            'enccode' => $result[0]->enccode,
-            'opdtime' => $result[0]->opdtime,
-            'patientbirthdate' => $result[0]->patientbirthdate,
+            'patientname' => $preferredRecord->patientname,
+            'hpercode' => $preferredRecord->hpercode,
+            'enccode' => $preferredRecord->enccode,
+            'opdtime' => $preferredRecord->opdtime,
+            'patientbirthdate' => $preferredRecord->patientbirthdate,
             'data' => $decodedData,
-            'vaccineday' => $result[0]->vaccineday,
-            'lockCase' => $result[0]->lockCase
+            'vaccineday' => $preferredRecord->vaccineday,
+            'lockCase' => $preferredRecord->lockCase
         ];
 
         return response()->json($responseData);
